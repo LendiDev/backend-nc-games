@@ -1,57 +1,59 @@
 # Northcoders House of Games API
 
-## Background
+### Description
 
-We will be building an API for the purpose of accessing application data programmatically. The intention here is to mimic the building of a real world backend service (such as reddit) which should provide this information to the front end architecture.
+This is an API for the purpose of accessing application data programmatically. The intention here is to mimic the building of a real world backend service (such as reddit) which should provide this information to the front end architecture.
 
-Your database will be PSQL, and you will interact with it using [node-postgres](https://node-postgres.com/).
+This API is using PSQL, and interaction with it using [node-postgres](https://node-postgres.com/).
 
-## Kanban
+### 1. Setting up the Environment
 
-### Link to your Trello Board here: https://trello.com/b/gBtX4GN3/be-nc-games
-
-To keep track of the tasks involved in this project we're going to use a kanban board. Ensure that you work on one _ticket_ at time. You can click on the ticket to find out more information about what is required for the feature. A ticket is not considered complete unless both the happy path and errors response are handled. You can make use of the checklist on each ticket to keep track of the errors you want to handle. You can also make use of [error-handling.md](error-handling.md) to consider the error codes we may wish to respond with.
-
-**Please ensure you work through the tickets in numerical order.**
-
-## Git Branching and Pull Requests
-
-You will be working on each ticket on a new **branch**.
-
-To create and switch to a new git branch use the command:
+Before running the application or tests, you should ensure that all dependencies are installed by running the following command:
 
 ```
-git checkout -b <new branch name>
+npm install
 ```
 
-This will create a branch and move over to that branch. (Omit the `-b` flag if you wish to switch to an already existing branch).
+This will install all required dependencies for the project.
 
-We recommend that you name the branch after the number assigned to each ticket via the header. eg. `ncnews-1`
+### 2. Setting up the Environment Variables
 
-When pushing the branch to git hub ensure that you make reference to the branch you are pushing to on the remote.
+To run this project locally, you will need to set up environment variables for the two databases. The necessary environment variables are defined in two files named ***.env.development*** and ***.env.test***.
 
+Before setting up the environment variables, you should first make a copy of the example environment file ***.env.example*** and rename it to ***.env.development*** and ***.env.test*** respectively.
+
+The **PGDATABASE** environment variable defines the name of the database that the application will use for each environment. The difference between the development and test databases is that the development database is used to store data during the development process, while the test database is used to run automated tests against the application.
+
+Next, open the ***.env.development*** and ***.env.test*** files and replace database_name_here with the name of your databases for each environment variable **PGDATABASE**.
+
+Here's what the content of ***.env.development*** and ***.env.test*** files should look like:
+
+***.env.development***
 ```
-git push origin <branch name>
-```
-
-From github you can make a pull request and share the link and ticket number via a pull request specific nchelp using the command `nchelp pr`. A tutor will swing by to review your code. Ensure that you keep your trello up to date whilst you await the PR approval. Regular `nchelp` will be available for when you need support.
-
-Once a pull request been accepted be sure to switch back to the main branch and pull down the updated changes.
-
-```
-git checkout main
-
-git pull origin main
-```
-
-You can tidy up your local branches once they have been pull into main by deleting them:
-
-```
-git branch -D <local branch>
+PGDATABASE=nc_games
 ```
 
-## Husky
+***.env.test***
+```
+PGDATABASE=nc_games_test
+```
 
-To ensure we are not commiting broken code this project makes use of git hooks. Git hooks are scripts triggered during certain events in the git lifecycle. Husky is a popular package which allows us to set up and maintain these scripts. This project makes use a _pre-commit hook_. When we attempt to commit our work, the script defined in the `pre-commit` file will run. If any of our tests fail than the commit will be aborted.
+For security reasons, you should never commit your environment variables to your code repository, which is why the ***.env.**** files are added to the ***.gitignore*** file.
 
-The [Husky documentation](https://typicode.github.io/husky/#/) explains how to configure Husky for your own project as well as creating your own custom hooks.\_
+### 3. Setting up the Databases
+
+To set up the development and test databases, you need to use the following command:
+
+```
+npm run setup-dbs
+```
+
+This command will create the necessary databases using the names specified in the ***.env.development*** and ***.env.test*** files.
+
+### 4. Seeding the Databases
+
+In order to seed the development database with some initial data, you need to use the following command:
+
+```
+npm run seed
+```
