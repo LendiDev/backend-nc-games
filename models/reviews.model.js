@@ -18,4 +18,16 @@ const selectReviews = async () => {
   return rows;
 };
 
-module.exports = { selectReviews };
+const selectReviewById = async (review_id) => {
+  const { rows, rowCount } = await db.query(`
+      SELECT * FROM reviews 
+      WHERE review_id = $1;`,
+    [review_id]
+  );
+
+  if (rowCount === 0) throw new CustomError(404, "Review not found");
+
+  return rows[0];
+};
+
+module.exports = { selectReviews, selectReviewById };
