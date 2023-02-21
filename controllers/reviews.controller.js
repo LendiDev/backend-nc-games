@@ -1,4 +1,8 @@
-const { selectReviews, selectCommentsByReviewId } = require("../models/reviews.model");
+const {
+  selectReviews,
+  selectCommentsByReviewId,
+  selectReviewById,
+} = require("../models/reviews.model");
 
 const getReviews = async (req, res, next) => {
   try {
@@ -22,4 +26,16 @@ const getCommentsByReviewId = async (req, res, next) => {
   }
 };
 
-module.exports = { getReviews, getCommentsByReviewId };
+const getReviewById = async (req, res, next) => {
+  const { review_id } = req.params;
+
+  try {
+    const review = await selectReviewById(review_id);
+
+    res.status(200).send({ review });
+  } catch (err) {
+    next(err);
+  }
+};
+
+module.exports = { getReviews, getCommentsByReviewId, getReviewById };

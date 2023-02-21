@@ -71,7 +71,62 @@ describe("app", () => {
               );
               expect(reviewsCommentsTotalCount).toBe(6);
 
-              expect(reviews).toBeSorted("created_at", { descending: true });
+              expect(reviews).toBeSortedBy("created_at", { descending: true });
+            });
+        });
+      });
+    });
+  });
+
+  describe("/api/reviews/:review_id", () => {
+    describe("GET", () => {
+      describe("Successful Responses", () => {
+        test("200 - responds with a review object by review_id", () => {
+          const reviewId = 1;
+          return request(app)
+            .get(`/api/reviews/${reviewId}`)
+            .expect(200)
+            .then(({ body }) => {
+              const { review } = body;
+
+              expect(review).toEqual(
+                expect.objectContaining({
+                  review_id: reviewId,
+                  title: expect.any(String),
+                  review_body: expect.any(String),
+                  designer: expect.any(String),
+                  review_img_url: expect.any(String),
+                  votes: expect.any(Number),
+                  category: expect.any(String),
+                  owner: expect.any(String),
+                  created_at: expect.any(String),
+                })
+              );
+            });
+        });
+      });
+
+      describe("Unsuccessful Responses", () => {
+        test("400 - response with message 'Bad request' when wrong type passed in as review_id", () => {
+          const reviewId = 'something-illegal';
+          return request(app)
+            .get(`/api/reviews/${reviewId}`)
+            .expect(400)
+            .then(({ body }) => {
+              const { message } = body;
+
+              expect(message).toBe('Bad request');
+            });
+        });
+        test("404 - response with message 'Review not found' when review_id doesn't exist", () => {
+          const reviewId = 9999999;
+          return request(app)
+            .get(`/api/reviews/${reviewId}`)
+            .expect(404)
+            .then(({ body }) => {
+              const { message } = body;
+
+              expect(message).toBe('Review not found');
             });
         });
       });

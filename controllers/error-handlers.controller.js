@@ -10,8 +10,8 @@ const customErrorsHandler = (err, req, res, next) => {
 
 const psqlErrorsHandler = (err, req, res, next) => {
   // TODO: add extra logical errors by codes
-  if (err.code) {
-    console.log("PSQL ERROR: ", err);
+  if (err.code) console.log("PSQL ERROR: ", err);
+  if (err.code === '22P02') {
     res.status(400).send({ message: "Bad request" });
   } else next(err);
 };
