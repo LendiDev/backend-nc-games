@@ -4,8 +4,12 @@ const db = require("../db/connection");
 const seed = require("../db/seeds/seed");
 const testData = require("../db/data/test-data");
 
-const emptyReviewsTable = async () => {
-  await db.query("TRUNCATE reviews RESTART IDENTITY CASCADE;");
+const emptyReviewsTable = () => {
+  db.query("TRUNCATE reviews RESTART IDENTITY CASCADE;");
+};
+
+const emptyUsersTable = () => {
+  db.query("TRUNCATE users RESTART IDENTITY CASCADE;");
 };
 
 beforeEach(() => {
@@ -362,6 +366,41 @@ describe("app", () => {
               const { message } = body;
 
               expect(message).toBe("Comment cannot be empty");
+            });
+        });
+      });
+    });
+  });
+
+  describe("/api/users", () => {
+    describe("GET", () => {
+      describe("Successful Responses", () => {
+        test("200 - responds with an array of users", () => {
+          return request(app)
+            .get("/api/users")
+            .expect(200)
+            .then(({ body }) => {
+              const { users } = body;
+
+              users.forEach((user) => {
+                expect(user).toHaveProperty("username", expect.any(String));
+                expect(user).toHaveProperty("name", expect.any(String));
+                expect(user).toHaveProperty("avatar_url", expect.any(String));
+              });
+
+              expect(users).toHaveLength(4);
+            });
+        });
+
+        test("200 - responds with an empty array of reviews objects if there is no reviews", () => {
+          emptyUsersTable();
+          return request(app)
+            .get("/api/users")
+            .expect(200)
+            .then(({ body }) => {
+              const { users } = body;
+
+              expect(users).toHaveLength(0);
             });
         });
       });
