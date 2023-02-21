@@ -5,8 +5,8 @@ const seed = require("../db/seeds/seed");
 const testData = require("../db/data/test-data");
 
 const emptyReviewsTable = async () => {
-  await db.query('TRUNCATE reviews RESTART IDENTITY CASCADE;');
-}
+  await db.query("TRUNCATE reviews RESTART IDENTITY CASCADE;");
+};
 
 beforeEach(() => {
   return seed(testData);
@@ -124,14 +124,14 @@ describe("app", () => {
 
       describe("Unsuccessful Responses", () => {
         test("400 - response with message 'Bad request' when wrong type passed in as review_id", () => {
-          const reviewId = 'something-illegal';
+          const reviewId = "something-illegal";
           return request(app)
             .get(`/api/reviews/${reviewId}`)
             .expect(400)
             .then(({ body }) => {
               const { message } = body;
 
-              expect(message).toBe('Bad request');
+              expect(message).toBe("Bad request");
             });
         });
         test("404 - response with message 'Review not found' when review_id doesn't exist", () => {
@@ -142,7 +142,136 @@ describe("app", () => {
             .then(({ body }) => {
               const { message } = body;
 
-              expect(message).toBe('Review not found');
+              expect(message).toBe("Review not found");
+            });
+        });
+      });
+    });
+
+    describe.skip("PATCH", () => {
+      describe("Successful Responses", () => {
+        test("200 - responds with updated review when increase votes", () => {
+          const reviewId = 2;
+          const patchObject = {
+            inc_votes: 5,
+          };
+          return request(app)
+            .patch(`/api/reviews/${reviewId}`)
+            .send(patchObject)
+            .expect(200)
+            .then(({ body }) => {
+              const { review } = body;
+
+              expect(review).toEqual(
+                expect.objectContaining({
+                  review_id: reviewId,
+                  title: expect.any(String),
+                  review_body: expect.any(String),
+                  designer: expect.any(String),
+                  review_img_url: expect.any(String),
+                  votes: 10,
+                  category: expect.any(String),
+                  owner: expect.any(String),
+                  created_at: expect.any(String),
+                })
+              );
+            });
+        });
+
+        test("200 - responds with updated review when decrease votes by passing negative inc_votes as a body object", () => {
+          const reviewId = 2;
+          const patchObject = {
+            inc_votes: -10,
+          };
+          return request(app)
+            .patch(`/api/reviews/${reviewId}`)
+            .send(patchObject)
+            .expect(200)
+            .then(({ body }) => {
+              const { review } = body;
+
+              expect(review).toEqual(
+                expect.objectContaining({
+                  review_id: reviewId,
+                  title: expect.any(String),
+                  review_body: expect.any(String),
+                  designer: expect.any(String),
+                  review_img_url: expect.any(String),
+                  votes: -5,
+                  category: expect.any(String),
+                  owner: expect.any(String),
+                  created_at: expect.any(String),
+                })
+              );
+            });
+        });
+      });
+
+      describe("Unsuccessful Responses", () => {
+        test("400 - response with message 'Bad request' when empty body passed in", () => {
+          const reviewId = 2;
+          const patchObject = "";
+          return request(app)
+            .patch(`/api/reviews/${reviewId}`)
+            .send(patchObject)
+            .expect(400)
+            .then(({ body }) => {
+              const { message } = body;
+
+              expect(message).toBe("Bad request");
+            });
+        });
+        test("400 - response with message 'Bad request' when empty body object passed in", () => {
+          const reviewId = 2;
+          const patchObject = {};
+          return request(app)
+            .patch(`/api/reviews/${reviewId}`)
+            .send(patchObject)
+            .expect(400)
+            .then(({ body }) => {
+              const { message } = body;
+
+              expect(message).toBe("Bad request");
+            });
+        });
+
+        test("400 - response with message 'Bad request' when review doesn't exist", () => {
+          const reviewId = 9999999;
+          const patchObject = "";
+          return request(app)
+            .patch(`/api/reviews/${reviewId}`)
+            .send(patchObject)
+            .expect(400)
+            .then(({ body }) => {
+              const { message } = body;
+
+              expect(message).toBe("Bad request");
+            });
+        });
+
+        test("400 - response with message 'Bad request' when no object has been send", () => {
+          const reviewId = 2;
+          return request(app)
+            .patch(`/api/reviews/${reviewId}`)
+            .expect(400)
+            .then(({ body }) => {
+              const { message } = body;
+
+              expect(message).toBe("Bad request");
+            });
+        });
+
+        test("400 - response with message 'Bad request' when body object has inc_votes with wrong data type", () => {
+          const reviewId = 2;
+          const patchObject = { inc_votes: "plus2" };
+          return request(app)
+            .patch(`/api/reviews/${reviewId}`)
+            .send(patchObject)
+            .expect(400)
+            .then(({ body }) => {
+              const { message } = body;
+
+              expect(message).toBe("Bad request");
             });
         });
       });
@@ -198,7 +327,7 @@ describe("app", () => {
               expect(message).toBe("Bad request");
             });
         });
-        
+
         test("404 - responds with message 'Review not found' when review_id doesn't exist", () => {
           const reviewId = 99999999;
           return request(app)
