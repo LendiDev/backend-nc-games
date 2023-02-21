@@ -13,13 +13,23 @@ const selectReviews = async () => {
       ORDER BY created_at DESC;
   `);
 
-  if (rowCount === 0) throw new CustomError(404, "No reviews found");
-
   return rows;
 };
 
+const selectCommentsByReviewId = async (review_id) => {
+  const { rows: comments, rowCount: commentsCount } = await db.query(
+    `SELECT * FROM comments 
+     WHERE review_id = $1 
+     ORDER BY created_at DESC;`,
+    [review_id]
+  );
+
+  return comments;
+};
+
 const selectReviewById = async (review_id) => {
-  const { rows, rowCount } = await db.query(`
+  const { rows, rowCount } = await db.query(
+    `
       SELECT * FROM reviews 
       WHERE review_id = $1;`,
     [review_id]
@@ -30,4 +40,4 @@ const selectReviewById = async (review_id) => {
   return rows[0];
 };
 
-module.exports = { selectReviews, selectReviewById };
+module.exports = { selectReviews, selectReviewById, selectCommentsByReviewId };
