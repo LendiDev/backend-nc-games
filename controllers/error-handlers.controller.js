@@ -9,11 +9,12 @@ const customErrorsHandler = (err, req, res, next) => {
 };
 
 const psqlErrorsHandler = (err, req, res, next) => {
-  // TODO: add extra logical errors by codes
-  if (err.code) console.log("PSQL ERROR: ", err);
-  if (err.code === '22P02') {
+  if (err.code === "22P02" || err.code === "23502" || err.code === "23503") {
     res.status(400).send({ message: "Bad request" });
-  } else next(err);
+  } else {
+    if (err.code) console.log("Unhandled PSQL ERROR: ", err);
+    next(err);
+  }
 };
 
 const internalErrorsHandler = (err, req, res) => {

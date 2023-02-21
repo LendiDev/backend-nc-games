@@ -9,5 +9,9 @@ reviewsRouter.get(
   "/:review_id/comments",
   CommentsController.getCommentsByReviewId
 );
+reviewsRouter.post(
+  "/:review_id/comments",
+  CommentsController.postCommentByReviewId
+);
 
 module.exports = reviewsRouter;
