@@ -148,7 +148,7 @@ describe("app", () => {
       });
     });
 
-    describe.skip("PATCH", () => {
+    describe("PATCH", () => {
       describe("Successful Responses", () => {
         test("200 - responds with updated review when increase votes", () => {
           const reviewId = 2;
@@ -238,6 +238,22 @@ describe("app", () => {
         test("400 - response with message 'Bad request' when review doesn't exist", () => {
           const reviewId = 9999999;
           const patchObject = "";
+          return request(app)
+            .patch(`/api/reviews/${reviewId}`)
+            .send(patchObject)
+            .expect(400)
+            .then(({ body }) => {
+              const { message } = body;
+
+              expect(message).toBe("Bad request");
+            });
+        });
+
+        test("400 - response with message 'Bad request' when review_id is wrong type but patch object is valid", () => {
+          const reviewId = 'twentyTwo';
+          const patchObject = {
+            inc_votes: 5,
+          };
           return request(app)
             .patch(`/api/reviews/${reviewId}`)
             .send(patchObject)
