@@ -4,6 +4,11 @@ const db = require("../db/connection");
 const seed = require("../db/seeds/seed");
 const testData = require("../db/data/test-data");
 
+const emptyReviewsTable = async () => {
+  await db.query('TRUNCATE comments RESTART IDENTITY CASCADE;');
+  await db.query('TRUNCATE reviews RESTART IDENTITY CASCADE;');
+}
+
 beforeEach(() => {
   return seed(testData);
 });
@@ -72,6 +77,18 @@ describe("app", () => {
               expect(reviewsCommentsTotalCount).toBe(6);
 
               expect(reviews).toBeSortedBy("created_at", { descending: true });
+            });
+        });
+
+        test("200 - responds with an empty array of reviews objects if there is no reviews", async () => {
+          await emptyReviewsTable();
+          return request(app)
+            .get("/api/reviews")
+            .expect(200)
+            .then(({ body }) => {
+              const { reviews } = body;
+
+              expect(reviews).toHaveLength(0);
             });
         });
       });
