@@ -5,7 +5,6 @@ const seed = require("../db/seeds/seed");
 const testData = require("../db/data/test-data");
 
 const emptyReviewsTable = async () => {
-  await db.query('TRUNCATE comments RESTART IDENTITY CASCADE;');
   await db.query('TRUNCATE reviews RESTART IDENTITY CASCADE;');
 }
 
