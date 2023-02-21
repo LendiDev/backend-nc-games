@@ -1,6 +1,7 @@
 const {
   selectReviews,
   selectReviewById,
+  updateReview,
 } = require("../models/reviews.model");
 
 const getReviews = async (req, res, next) => {
@@ -25,4 +26,17 @@ const getReviewById = async (req, res, next) => {
   }
 };
 
-module.exports = { getReviews, getReviewById };
+const patchReview = async (req, res, next) => {
+  const { review_id } = req.params;
+  const patchObject = req.body;
+
+  try {
+    const review = await updateReview(review_id, patchObject);
+
+    res.status(200).send({ review });
+  } catch (err) {
+    next(err);
+  }
+};
+
+module.exports = { getReviews, getReviewById, patchReview };
