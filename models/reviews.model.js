@@ -29,4 +29,21 @@ const selectReviewById = async (review_id) => {
   return rows[0];
 };
 
-module.exports = { selectReviews, selectReviewById };
+const updateReview = async (review_id, patchObject) => {
+  const { inc_votes } = patchObject;
+
+  const { rows, rowCount } = await db.query(
+    `
+      UPDATE reviews 
+      SET votes = votes + $2
+      WHERE review_id = $1
+      RETURNING *`,
+    [review_id, inc_votes]
+  );
+
+  if (rowCount === 0) throw new CustomError(400, "Bad request");
+
+  return rows[0];
+};
+
+module.exports = { selectReviews, selectReviewById, updateReview };
