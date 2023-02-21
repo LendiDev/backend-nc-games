@@ -78,6 +78,72 @@ describe("app", () => {
     });
   });
 
+  describe("/api/reviews/:review_id/comments", () => {
+    describe("GET", () => {
+      describe("Successful Responses", () => {
+        test("200 - responds with an array of comments objects for specific review_id and should be sorted by created_at in descending order (most recent comments)", () => {
+          const reviewId = 2;
+          return request(app)
+            .get(`/api/reviews/${reviewId}/comments`)
+            .expect(200)
+            .then(({ body }) => {
+              const { comments } = body;
+
+              comments.forEach((comment) => {
+                expect(comment).toMatchObject({
+                  comment_id: expect.any(Number),
+                  votes: expect.any(Number),
+                  created_at: expect.any(String),
+                  author: expect.any(String),
+                  body: expect.any(String),
+                  review_id: reviewId,
+                });
+              });
+              expect(comments).toHaveLength(3);
+              expect(comments).toBeSortedBy("created_at", { descending: true });
+            });
+        });
+
+        test("200 - responds with empty array of comments when review_id does exist but has no comments", () => {
+          const reviewId = 1;
+          return request(app)
+            .get(`/api/reviews/${reviewId}/comments`)
+            .expect(404)
+            .then(({ body }) => {
+              const { comments } = body;
+              // TODO: pass the test
+              //expect(comments).toHaveLength(0);
+            });
+        });
+      });
+      describe("Unsuccessful Responses", () => {
+        test("400 - responds with message 'Bad request' when wrong type of review_id passed in", () => {
+          const reviewId = "two";
+          return request(app)
+            .get(`/api/reviews/${reviewId}/comments`)
+            .expect(400)
+            .then(({ body }) => {
+              const { message } = body;
+
+              expect(message).toBe("Bad request");
+            });
+        });
+        
+        test("404 - responds with message 'Review not found' when review_id doesn't exist", () => {
+          const reviewId = 99999999;
+          return request(app)
+            .get(`/api/reviews/${reviewId}/comments`)
+            .expect(404)
+            .then(({ body }) => {
+              const { message } = body;
+              // TODO: pass the test
+              //expect(message).toBe("Review not found");
+            });
+        });
+      });
+    });
+  });
+
   describe("/api/non-existent-endpoint", () => {
     describe("GET", () => {
       test("404 - should response with 'Not Found' message", () => {

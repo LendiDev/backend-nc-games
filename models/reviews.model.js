@@ -18,4 +18,17 @@ const selectReviews = async () => {
   return rows;
 };
 
-module.exports = { selectReviews };
+const selectCommentsByReviewId = async (review_id) => {
+  const { rows: comments, rowCount: commentsCount } = await db.query(
+    `SELECT * FROM comments 
+     WHERE review_id = $1 
+     ORDER BY created_at DESC;`,
+    [review_id]
+  );
+
+  if (commentsCount === 0) throw new CustomError(404, `No comments found`);
+
+  return comments;
+};
+
+module.exports = { selectReviews, selectCommentsByReviewId };
