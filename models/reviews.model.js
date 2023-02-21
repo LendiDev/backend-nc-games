@@ -26,8 +26,6 @@ const selectCommentsByReviewId = async (review_id) => {
     [review_id]
   );
 
-  if (commentsCount === 0) throw new CustomError(404, `No comments found`);
-
   return comments;
 };
 

@@ -136,7 +136,7 @@ describe("app", () => {
   describe("/api/reviews/:review_id/comments", () => {
     describe("GET", () => {
       describe("Successful Responses", () => {
-        test("200 - responds with an array of comments objects for specific review_id and should be sorted by created_at in descending order (most recent comments)", () => {
+        test("200 - responds with an array of comments for specific review_id and should be sorted by created_at in descending order (most recent comments)", () => {
           const reviewId = 2;
           return request(app)
             .get(`/api/reviews/${reviewId}/comments`)
@@ -163,11 +163,10 @@ describe("app", () => {
           const reviewId = 1;
           return request(app)
             .get(`/api/reviews/${reviewId}/comments`)
-            .expect(404)
+            .expect(200)
             .then(({ body }) => {
               const { comments } = body;
-              // TODO: pass the test
-              //expect(comments).toHaveLength(0);
+              expect(comments).toHaveLength(0);
             });
         });
       });
@@ -191,8 +190,7 @@ describe("app", () => {
             .expect(404)
             .then(({ body }) => {
               const { message } = body;
-              // TODO: pass the test
-              //expect(message).toBe("Review not found");
+              expect(message).toBe("Review not found");
             });
         });
       });
