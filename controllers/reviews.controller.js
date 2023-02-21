@@ -31,6 +31,7 @@ const patchReview = async (req, res, next) => {
   const patchObject = req.body;
 
   try {
+    await selectReviewById(review_id);
     const review = await updateReview(review_id, patchObject);
 
     res.status(200).send({ review });
