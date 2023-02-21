@@ -235,17 +235,17 @@ describe("app", () => {
             });
         });
 
-        test("400 - response with message 'Bad request' when review doesn't exist", () => {
+        test("404 - response with message 'Review not found' when request is valid but review doesn't exist", () => {
           const reviewId = 9999999;
           const patchObject = "";
           return request(app)
             .patch(`/api/reviews/${reviewId}`)
             .send(patchObject)
-            .expect(400)
+            .expect(404)
             .then(({ body }) => {
               const { message } = body;
 
-              expect(message).toBe("Bad request");
+              expect(message).toBe("Review not found");
             });
         });
 
