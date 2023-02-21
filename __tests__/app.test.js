@@ -5,8 +5,8 @@ const seed = require("../db/seeds/seed");
 const testData = require("../db/data/test-data");
 
 const emptyReviewsTable = async () => {
-  await db.query('TRUNCATE reviews RESTART IDENTITY CASCADE;');
-}
+  await db.query("TRUNCATE reviews RESTART IDENTITY CASCADE;");
+};
 
 beforeEach(() => {
   return seed(testData);
@@ -124,14 +124,14 @@ describe("app", () => {
 
       describe("Unsuccessful Responses", () => {
         test("400 - response with message 'Bad request' when wrong type passed in as review_id", () => {
-          const reviewId = 'something-illegal';
+          const reviewId = "something-illegal";
           return request(app)
             .get(`/api/reviews/${reviewId}`)
             .expect(400)
             .then(({ body }) => {
               const { message } = body;
 
-              expect(message).toBe('Bad request');
+              expect(message).toBe("Bad request");
             });
         });
         test("404 - response with message 'Review not found' when review_id doesn't exist", () => {
@@ -142,7 +142,7 @@ describe("app", () => {
             .then(({ body }) => {
               const { message } = body;
 
-              expect(message).toBe('Review not found');
+              expect(message).toBe("Review not found");
             });
         });
       });
@@ -198,7 +198,7 @@ describe("app", () => {
               expect(message).toBe("Bad request");
             });
         });
-        
+
         test("404 - responds with message 'Review not found' when review_id doesn't exist", () => {
           const reviewId = 99999999;
           return request(app)
@@ -207,6 +207,161 @@ describe("app", () => {
             .then(({ body }) => {
               const { message } = body;
               expect(message).toBe("Review not found");
+            });
+        });
+      });
+    });
+
+    describe("POST", () => {
+      describe("Successful Responses", () => {
+        test("201 - responds with posted comment", () => {
+          const reviewId = 1;
+          const commentToPost = {
+            username: "mallionaire",
+            body: "Amazing board game!",
+          };
+          return request(app)
+            .post(`/api/reviews/${reviewId}/comments`)
+            .send(commentToPost)
+            .expect(201)
+            .then(({ body }) => {
+              const { comment } = body;
+
+              expect(comment).toMatchObject({
+                comment_id: 7,
+                votes: 0,
+                created_at: expect.any(String),
+                author: commentToPost.username,
+                body: commentToPost.body,
+                review_id: reviewId,
+              });
+            });
+        });
+      });
+      describe("Unsuccessful Responses", () => {
+        test("400 - responds with message 'Bad request' when malformed body", () => {
+          const reviewId = 1;
+          return request(app)
+            .post(`/api/reviews/${reviewId}/comments`)
+            .send("")
+            .expect(400)
+            .then(({ body }) => {
+              const { message } = body;
+
+              expect(message).toBe("Bad request");
+            });
+        });
+
+        test("400 - responds with message 'Bad request' when missing all required fields", () => {
+          const reviewId = 1;
+          return request(app)
+            .post(`/api/reviews/${reviewId}/comments`)
+            .send("")
+            .expect(400)
+            .then(({ body }) => {
+              const { message } = body;
+
+              expect(message).toBe("Bad request");
+            });
+        });
+
+        test("400 - responds with message 'Bad request' when missing username field", () => {
+          const reviewId = 1;
+          const comment = {
+            body: "Amazing board game!",
+          };
+          return request(app)
+            .post(`/api/reviews/${reviewId}/comments`)
+            .send(comment)
+            .expect(400)
+            .then(({ body }) => {
+              const { message } = body;
+
+              expect(message).toBe("Bad request");
+            });
+        });
+
+        test("400 - responds with message 'Bad request' when missing body field", () => {
+          const reviewId = 1;
+          const comment = {
+            username: "mallionaire",
+          };
+          return request(app)
+            .post(`/api/reviews/${reviewId}/comments`)
+            .send(comment)
+            .expect(400)
+            .then(({ body }) => {
+              const { message } = body;
+
+              expect(message).toBe("Bad request");
+            });
+        });
+
+        test("400 - responds with message 'Bad request' when user doesn't exist", () => {
+          const reviewId = 1;
+          const comment = {
+            username: "mallionaire2222",
+            body: "Amazing board game!",
+          };
+          return request(app)
+            .post(`/api/reviews/${reviewId}/comments`)
+            .send(comment)
+            .expect(400)
+            .then(({ body }) => {
+              const { message } = body;
+
+              expect(message).toBe("Bad request");
+            });
+        });
+
+        test("400 - responds with message 'Bad request' when review doesn't exist", () => {
+          const reviewId = 999999999;
+          const comment = {
+            username: "mallionaire2222",
+            body: "Amazing board game!",
+          };
+          return request(app)
+            .post(`/api/reviews/${reviewId}/comments`)
+            .send(comment)
+            .expect(400)
+            .then(({ body }) => {
+              const { message } = body;
+
+              expect(message).toBe("Bad request");
+            });
+        });
+
+        test("400 - responds with message 'Bad request' when review _id is wrong type", () => {
+          const reviewId = "okokokok";
+          const comment = {
+            username: "mallionaire2222",
+            body: "Amazing board game!",
+          };
+          return request(app)
+            .post(`/api/reviews/${reviewId}/comments`)
+            .send(comment)
+            .expect(400)
+            .then(({ body }) => {
+              const { message } = body;
+
+              expect(message).toBe("Bad request");
+            });
+        });
+
+        test("400 - responds with message 'Comment cannot be empty' when body field is empty", () => {
+          const reviewId = 1;
+          const comment = {
+            username: "mallionaire",
+            body: "",
+          };
+          return request(app)
+            .post(`/api/reviews/${reviewId}/comments`)
+            .send(comment)
+            .expect(400)
+            .then(({ body }) => {
+              const { message } = body;
+
+              expect(message).toBe("Comment cannot be empty");
             });
         });
       });
