@@ -13,8 +13,6 @@ const selectReviews = async () => {
       ORDER BY created_at DESC;
   `);
 
-  if (rowCount === 0) throw new CustomError(404, "No reviews found");
-
   return rows;
 };
 
