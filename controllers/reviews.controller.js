@@ -1,12 +1,11 @@
-const {
-  selectReviews,
-  selectReviewById,
-} = require("../models/reviews.model");
+const { selectCategoryBySlug } = require("../models/categories.model");
+const { selectReviews, selectReviewById } = require("../models/reviews.model");
 
 const getReviews = async (req, res, next) => {
-  const { category, sort_by, order } = req.query;
+  const { category: category_slug, sort_by, order } = req.query;
   try {
-    const reviews = await selectReviews(category, sort_by, order);
+    if (category_slug) await selectCategoryBySlug(category_slug);
+    const reviews = await selectReviews(category_slug, sort_by, order);
 
     res.status(200).send({ reviews });
   } catch (err) {
