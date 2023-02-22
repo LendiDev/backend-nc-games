@@ -636,6 +636,43 @@ describe("app", () => {
     });
   });
 
+  describe.skip("/comments/:comment_id", () => {
+    describe("DELETE", () => {
+      describe("Successful Responses", () => {
+        test("204 - responds with no content on successful deletion", () => {
+          const commentId = 1;
+          return request(app)
+            .delete(`/comments/${commentId}`)
+            .expect(404)
+            .then(({ body }) => {
+              expect(body).toHaveLength(0);
+            });
+        });
+      });
+      describe("Unsuccessful Responses", () => {
+        test("404 - responds with error message 'Comment not found' when valid comment_id passed in but non-existent comment", () => {
+          const commentId = 999999999;
+          return request(app)
+            .delete(`/comments/${commentId}`)
+            .expect(404)
+            .then(({ body: {message} }) => {
+              expect(message).toBe('Comment not found');
+            });
+        });
+
+        test("400 - responds with error message 'Bad request' when invalid comment_id passed in", () => {
+          const commentId = 'first one';
+          return request(app)
+            .delete(`/comments/${commentId}`)
+            .expect(400)
+            .then(({ body: {message} }) => {
+              expect(message).toBe('Bad request');
+            });
+        });
+      });
+    });
+  });
+
   describe("/api/non-existent-endpoint", () => {
     describe("GET", () => {
       test("404 - should response with 'Not Found' message", () => {
