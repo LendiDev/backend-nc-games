@@ -353,6 +353,31 @@ describe("app", () => {
               );
             });
         });
+
+        test("200 - responds with a review object including comment_count by review_id", () => {
+          const reviewId = 2;
+          return request(app)
+            .get(`/api/reviews/${reviewId}`)
+            .expect(200)
+            .then(({ body }) => {
+              const { review } = body;
+
+              expect(review).toEqual(
+                expect.objectContaining({
+                  review_id: reviewId,
+                  title: expect.any(String),
+                  review_body: expect.any(String),
+                  designer: expect.any(String),
+                  review_img_url: expect.any(String),
+                  votes: expect.any(Number),
+                  category: expect.any(String),
+                  owner: expect.any(String),
+                  created_at: expect.any(String),
+                  comment_count: 3,
+                })
+              );
+            });
+        });
       });
 
       describe("Unsuccessful Responses", () => {

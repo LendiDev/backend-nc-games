@@ -56,8 +56,10 @@ const selectReviews = async (
 const selectReviewById = async (review_id) => {
   const { rows, rowCount } = await db.query(
     `
-      SELECT * FROM reviews 
-      WHERE review_id = $1;`,
+      SELECT reviews.*, CAST(COUNT(comments.review_id) as INT) as comment_count FROM reviews
+      LEFT JOIN comments USING (review_id)
+      WHERE review_id = $1
+      GROUP BY reviews.review_id;`,
     [review_id]
   );
 
