@@ -143,13 +143,14 @@ describe("app", () => {
               expect(reviews).toHaveLength(0);
             });
         });
-
-        test("200 - responds with an empty array of reviews when specified category doesn't exist", () => {
+      });
+      describe("Unsuccessful Responses", () => {
+        test("404 - responds with error message when specified category doesn't exist", () => {
           return request(app)
-            .get("/api/reviews?category=children's games")
-            .expect(200)
-            .then(({ body: { reviews } }) => {
-              expect(reviews).toHaveLength(0);
+            .get("/api/reviews?category=non existent category")
+            .expect(404)
+            .then(({ body: { message } }) => {
+              expect(message).toBe("Category not found");
             });
         });
       });
@@ -235,7 +236,9 @@ describe("app", () => {
             .get(`/api/reviews?order=descending`)
             .expect(400)
             .then(({ body: { message } }) => {
-              expect(message).toBe("Wrong query parameter of 'order'. ASC or DESC are only permitted");
+              expect(message).toBe(
+                "Wrong query parameter of 'order'. ASC or DESC are only permitted"
+              );
             });
         });
       });
@@ -257,6 +260,16 @@ describe("app", () => {
                 });
             });
           });
+        });
+      });
+      describe("Successful Responses", () => {
+        test("400 - response with custom message 'Reviews cannot be sorted by '...'' when not permitted order query value requested and category not specified", () => {
+          return request(app)
+            .get(`/api/reviews?sort_by=author&order=ASC`)
+            .expect(400)
+            .then(({ body: { message } }) => {
+              expect(message).toBe("Reviews cannot be sorted by 'author'");
+            });
         });
       });
     });
@@ -294,20 +307,14 @@ describe("app", () => {
         });
       });
       describe("Unsuccessful Responses", () => {
-        test("400 - response with custom message 'Wrong query parameter of 'order'. ASC or DESC are only permitted' when not permitted order query value requested and category doesn't exist", () => {
+        test("400 - response with custom message 'Wrong query parameter of 'order'. ASC or DESC are only permitted' when not permitted order query value requested and category is valid", () => {
           return request(app)
-            .get(`/api/reviews?category=wrong&order=ASCC`)
+            .get(`/api/reviews?category=dexterity&order=ASCC`)
             .expect(400)
             .then(({ body: { message } }) => {
-              expect(message).toBe("Wrong query parameter of 'order'. ASC or DESC are only permitted");
-            });
-        });
-        test("400 - response with custom message 'Reviews cannot be sorted by '...'' when not permitted order query value requested and category doesn't exist but valid order query value", () => {
-          return request(app)
-            .get(`/api/reviews?category=wrong&sort_by=author&order=ASC`)
-            .expect(400)
-            .then(({ body: { message } }) => {
-              expect(message).toBe("Reviews cannot be sorted by 'author'");
+              expect(message).toBe(
+                "Wrong query parameter of 'order'. ASC or DESC are only permitted"
+              );
             });
         });
         test("400 - response with custom message 'Reviews cannot be sorted by '...'' when not permitted order query value requested and category does exist, and valid order query value requested", () => {
@@ -316,6 +323,14 @@ describe("app", () => {
             .expect(400)
             .then(({ body: { message } }) => {
               expect(message).toBe("Reviews cannot be sorted by 'author'");
+            });
+        });
+        test("404 - response with error message 'Category not found' when not permitted order query value requested and category does not exist, and valid order query value requested", () => {
+          return request(app)
+            .get(`/api/reviews?category=superset&sort_by=author&order=ASC`)
+            .expect(404)
+            .then(({ body: { message } }) => {
+              expect(message).toBe("Category not found");
             });
         });
       });
