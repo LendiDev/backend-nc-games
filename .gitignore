@@ -1,3 +1,4 @@
 node_modules
 .env.*
 /db/playground.sql
+.DS_Store
