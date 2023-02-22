@@ -1,26 +1,65 @@
 const db = require("../db/connection");
 const CustomError = require("../utils/custom-error");
 
-const selectReviews = async () => {
-  const { rows, rowCount } = await db.query(`
+const selectReviews = async (
+  category,
+  sort_by = "created_at",
+  order = "DESC"
+) => {
+  const sortByWhitelist = [
+    "owner",
+    "title",
+    "category",
+    "created_at",
+    "votes",
+    "designer",
+    "comment_count",
+  ];
+  const orderWhitelist = ["ASC", "DESC"];
+
+  if (!orderWhitelist.includes(order.toUpperCase())) {
+    throw new CustomError(
+      400,
+      "Wrong query parameter of 'order'. ASC or DESC are only permitted"
+    );
+  }
+
+  if (!sortByWhitelist.includes(sort_by.toLowerCase())) {
+    throw new CustomError(400, `Reviews cannot be sorted by '${sort_by}'`);
+  }
+
+  const queryValues = [];
+  let whereQueryString = "";
+  if (category) {
+    whereQueryString += "WHERE review.category = $1";
+    queryValues.push(category);
+  }
+
+  const { rows: reviews, rowCount } = await db.query(
+    `
       SELECT 
-          owner, title, review_id, category, review_img_url, review.created_at, review.votes, designer, CAST(COUNT(comments.review_id) as INT) as comment_count 
+          review.*, CAST(COUNT(comments.review_id) as INT) as comment_count 
       FROM 
           reviews review
       LEFT JOIN comments USING (review_id)
+      ${whereQueryString}
       GROUP BY 
-          comments.review_id, review.review_id, review.owner, review.title, review.category, review.review_img_url, review.created_at, review.votes, review.designer
-      ORDER BY created_at DESC;
-  `);
+          review.review_id
+      ORDER BY ${sort_by} ${order};
+  `,
+    queryValues
+  );
 
-  return rows;
+  return reviews;
 };
 
 const selectReviewById = async (review_id) => {
   const { rows, rowCount } = await db.query(
     `
-      SELECT * FROM reviews 
-      WHERE review_id = $1;`,
+      SELECT reviews.*, CAST(COUNT(comments.review_id) as INT) as comment_count FROM reviews
+      LEFT JOIN comments USING (review_id)
+      WHERE review_id = $1
+      GROUP BY reviews.review_id;`,
     [review_id]
   );
 
