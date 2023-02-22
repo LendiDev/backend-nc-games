@@ -45,6 +45,18 @@ describe("app", () => {
     });
   });
 
+  const expectedReviewShape = {
+    owner: expect.any(String),
+    title: expect.any(String),
+    review_id: expect.any(Number),
+    category: expect.any(String),
+    review_img_url: expect.any(String),
+    created_at: expect.any(String),
+    review_body: expect.any(String),
+    designer: expect.any(String),
+    votes: expect.any(Number),
+  };
+
   describe("/api/reviews", () => {
     describe("GET", () => {
       describe("Successful Responses", () => {
@@ -55,30 +67,18 @@ describe("app", () => {
             .then(({ body }) => {
               const { reviews } = body;
 
-              reviews.forEach((review) => {
-                expect(review).toHaveProperty("owner", expect.any(String));
-                expect(review).toHaveProperty("title", expect.any(String));
-                expect(review).toHaveProperty("review_id", expect.any(Number));
-                expect(review).toHaveProperty("category", expect.any(String));
-                expect(review).toHaveProperty(
-                  "review_img_url",
-                  expect.any(String)
-                );
-                expect(review).toHaveProperty("created_at", expect.any(String));
-                expect(review).toHaveProperty("votes", expect.any(Number));
-                expect(review).toHaveProperty("designer", expect.any(String));
-                expect(review).toHaveProperty(
-                  "comment_count",
-                  expect.any(Number)
-                );
-              });
-              expect(reviews).toHaveLength(13);
-
               const reviewsCommentsTotalCount = eval(
                 reviews.map((review) => review.comment_count).join("+")
               );
-              expect(reviewsCommentsTotalCount).toBe(6);
 
+              reviews.forEach((review) => {
+                expect(review).toEqual(
+                  expect.objectContaining(expectedReviewShape)
+                );
+              });
+
+              expect(reviews).toHaveLength(13);
+              expect(reviewsCommentsTotalCount).toBe(6);
               expect(reviews).toBeSortedBy("created_at", { descending: true });
             });
         });
@@ -90,8 +90,247 @@ describe("app", () => {
             .expect(200)
             .then(({ body }) => {
               const { reviews } = body;
-
               expect(reviews).toHaveLength(0);
+            });
+        });
+      });
+    });
+
+    const reviewsSortByWhitelist = [
+      "owner",
+      "title",
+      "category",
+      "created_at",
+      "votes",
+      "designer",
+      "comment_count",
+    ];
+    const reviewsOrderWhitelist = ["ASC", "DESC"];
+    const reviewsCategories = [
+      { slug: "euro game", expectedLength: 1 },
+      { slug: "social deduction", expectedLength: 11 },
+    ];
+
+    describe("GET ?category=...", () => {
+      describe("Successful Responses", () => {
+        test("200 - responds with an array of reviews objects based on category value and should be in descending (default) order by created_at (default)", () => {
+          return request(app)
+            .get("/api/reviews?category=euro game")
+            .expect(200)
+            .then(({ body: { reviews } }) => {
+              const reviewsCommentsTotalCount = eval(
+                reviews.map((review) => review.comment_count).join("+")
+              );
+              reviews.forEach((review) => {
+                expect(review).toEqual(
+                  expect.objectContaining({
+                    ...expectedReviewShape,
+                    category: "euro game",
+                  })
+                );
+              });
+              expect(reviews).toHaveLength(1);
+              expect(reviewsCommentsTotalCount).toBe(0);
+              expect(reviews).toBeSortedBy("created_at", { descending: true });
+            });
+        });
+
+        test("200 - responds with an empty array of reviews when there is no reviews in a category", () => {
+          return request(app)
+            .get("/api/reviews?category=children's games")
+            .expect(200)
+            .then(({ body: { reviews } }) => {
+              expect(reviews).toHaveLength(0);
+            });
+        });
+      });
+      describe("Unsuccessful Responses", () => {
+        test("404 - responds with error message when specified category doesn't exist", () => {
+          return request(app)
+            .get("/api/reviews?category=non existent category")
+            .expect(404)
+            .then(({ body: { message } }) => {
+              expect(message).toBe("Category not found");
+            });
+        });
+      });
+    });
+
+    describe("GET ?category=...$order=...", () => {
+      describe("Successful Responses", () => {
+        test("200 - responds with an array of reviews objects based on category value and should be in ascending order by created_at (default)", () => {
+          return request(app)
+            .get("/api/reviews/?category=social deduction&order=ASC")
+            .expect(200)
+            .then(({ body: { reviews } }) => {
+              reviews.forEach((review) => {
+                expect(review).toEqual(
+                  expect.objectContaining({
+                    ...expectedReviewShape,
+                    category: "social deduction",
+                  })
+                );
+              });
+
+              expect(reviews).toHaveLength(11);
+              expect(reviews).toBeSortedBy("created_at");
+            });
+        });
+      });
+    });
+
+    describe("GET ?sort_by=...", () => {
+      describe("Successful Responses", () => {
+        reviewsSortByWhitelist.forEach((sortBy) => {
+          test(`200 - responds with an array of all reviews objects and should be sorted by ${sortBy} in DESC (default) order`, () => {
+            return request(app)
+              .get(`/api/reviews?sort_by=${sortBy}`)
+              .expect(200)
+              .then(({ body: { reviews } }) => {
+                reviews.forEach((review) => {
+                  expect(review).toEqual(
+                    expect.objectContaining({
+                      ...expectedReviewShape,
+                    })
+                  );
+                });
+
+                expect(reviews.length).toBeGreaterThan(0);
+                expect(reviews).toBeSortedBy(sortBy, {
+                  descending: true,
+                });
+              });
+          });
+        });
+      });
+      describe("Unsuccessful Responses", () => {
+        test("400 - response with custom message 'Reviews cannot be sorted by '...'' when not permitted sort_by query value requested", () => {
+          return request(app)
+            .get(`/api/reviews?sort_by=author`)
+            .expect(400)
+            .then(({ body: { message } }) => {
+              expect(message).toBe("Reviews cannot be sorted by 'author'");
+            });
+        });
+      });
+    });
+    describe("GET ?order=...", () => {
+      describe("Successful Responses", () => {
+        reviewsOrderWhitelist.forEach((order) => {
+          test(`200 - responds with an array of all reviews objects and should be sorted by created_at (default) in ${order} order`, () => {
+            return request(app)
+              .get(`/api/reviews?order=${order}`)
+              .expect(200)
+              .then(({ body: { reviews } }) => {
+                expect(reviews.length).toBeGreaterThan(0);
+                expect(reviews).toBeSortedBy("created_at", {
+                  descending: order === "DESC" && true,
+                });
+              });
+          });
+        });
+      });
+      describe("Unsuccessful Responses", () => {
+        test("400 - response with custom message 'Wrong query parameter of 'order'. ASC or DESC are only permitted' when not permitted order query value requested", () => {
+          return request(app)
+            .get(`/api/reviews?order=descending`)
+            .expect(400)
+            .then(({ body: { message } }) => {
+              expect(message).toBe(
+                "Wrong query parameter of 'order'. ASC or DESC are only permitted"
+              );
+            });
+        });
+      });
+    });
+
+    describe("GET ?sort_by=...&order=...", () => {
+      describe("Successful Responses", () => {
+        reviewsOrderWhitelist.forEach((order) => {
+          reviewsSortByWhitelist.forEach((sortBy) => {
+            test(`200 - responds with an array of all reviews objects and should be sorted by ${sortBy} in ${order} order`, () => {
+              return request(app)
+                .get(`/api/reviews?sort_by=${sortBy}&order=${order}`)
+                .expect(200)
+                .then(({ body: { reviews } }) => {
+                  expect(reviews.length).toBeGreaterThan(0);
+                  expect(reviews).toBeSortedBy(sortBy, {
+                    descending: order === "DESC" && true,
+                  });
+                });
+            });
+          });
+        });
+      });
+      describe("Successful Responses", () => {
+        test("400 - response with custom message 'Reviews cannot be sorted by '...'' when not permitted order query value requested and category not specified", () => {
+          return request(app)
+            .get(`/api/reviews?sort_by=author&order=ASC`)
+            .expect(400)
+            .then(({ body: { message } }) => {
+              expect(message).toBe("Reviews cannot be sorted by 'author'");
+            });
+        });
+      });
+    });
+
+    describe("GET ?category=...sort_by=...&order=...", () => {
+      describe("Successful Responses", () => {
+        reviewsCategories.forEach(({ slug, expectedLength }) => {
+          reviewsOrderWhitelist.forEach((order) => {
+            reviewsSortByWhitelist.forEach((sortBy) => {
+              test(`200 - responds with an array of all reviews objects based on category '${slug}' and should be sorted by ${sortBy} in ${order} order`, () => {
+                return request(app)
+                  .get(
+                    `/api/reviews?category=${slug}&sort_by=${sortBy}&order=${order}`
+                  )
+                  .expect(200)
+                  .then(({ body }) => {
+                    const { reviews } = body;
+
+                    reviews.forEach((review) => {
+                      expect(review).toEqual(
+                        expect.objectContaining({
+                          ...expectedReviewShape,
+                          category: slug,
+                        })
+                      );
+                    });
+                    expect(reviews).toHaveLength(expectedLength);
+                    expect(reviews).toBeSortedBy(sortBy, {
+                      descending: order === "DESC" && true,
+                    });
+                  });
+              });
+            });
+          });
+        });
+      });
+      describe("Unsuccessful Responses", () => {
+        test("400 - response with custom message 'Wrong query parameter of 'order'. ASC or DESC are only permitted' when not permitted order query value requested and category is valid", () => {
+          return request(app)
+            .get(`/api/reviews?category=dexterity&order=ASCC`)
+            .expect(400)
+            .then(({ body: { message } }) => {
+              expect(message).toBe(
+                "Wrong query parameter of 'order'. ASC or DESC are only permitted"
+              );
+            });
+        });
+        test("400 - response with custom message 'Reviews cannot be sorted by '...'' when not permitted order query value requested and category does exist, and valid order query value requested", () => {
+          return request(app)
+            .get(`/api/reviews?category=dexterity&sort_by=author&order=ASC`)
+            .expect(400)
+            .then(({ body: { message } }) => {
+              expect(message).toBe("Reviews cannot be sorted by 'author'");
+            });
+        });
+        test("404 - response with error message 'Category not found' when not permitted order query value requested and category does not exist, and valid order query value requested", () => {
+          return request(app)
+            .get(`/api/reviews?category=superset&sort_by=author&order=ASC`)
+            .expect(404)
+            .then(({ body: { message } }) => {
+              expect(message).toBe("Category not found");
             });
         });
       });
@@ -110,17 +349,7 @@ describe("app", () => {
               const { review } = body;
 
               expect(review).toEqual(
-                expect.objectContaining({
-                  review_id: reviewId,
-                  title: expect.any(String),
-                  review_body: expect.any(String),
-                  designer: expect.any(String),
-                  review_img_url: expect.any(String),
-                  votes: expect.any(Number),
-                  category: expect.any(String),
-                  owner: expect.any(String),
-                  created_at: expect.any(String),
-                })
+                expect.objectContaining(expectedReviewShape)
               );
             });
         });

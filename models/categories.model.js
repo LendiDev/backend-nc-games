@@ -9,4 +9,15 @@ const selectCategories = async () => {
   return rows;
 };
 
-module.exports = { selectCategories };
+const selectCategoryBySlug = async (category_slug) => {
+  const { rows, rowCount } = await db.query(
+    `SELECT * FROM categories WHERE slug = $1`,
+    [category_slug]
+  );
+
+  if (rowCount === 0) throw new CustomError(404, "Category not found");
+
+  return rows[0];
+};
+
+module.exports = { selectCategories, selectCategoryBySlug };
