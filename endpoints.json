@@ -66,7 +66,7 @@
     }
   },
   "PATCH /api/reviews/:review_id": {
-    "description": "updates votes for a review defined by review id",
+    "description": "updates votes (increase or decrease by) of a review defined by review id",
     "queries": [],
     "onSuccessStatusCode": 200,
     "exampleRequests": [
@@ -130,6 +130,45 @@
     "queries": [],
     "onSuccessStatusCode": 204,
     "examplePayload": ""
+  },
+  "PATCH /api/comments/:comment_id": {
+    "description": "updates votes (increase or decrease by) of a comment defined by review id (-1, 1 only permitted)",
+    "queries": [],
+    "onSuccessStatusCode": 200,
+    "exampleRequests": [
+      {
+        "requestBody": {
+          "inc_votes": 1
+        },
+        "examplePayload": {
+          "comment": {
+            "comment_id": 2,
+            "body": "My dog loved this game too!",
+            "review_id": 4,
+            "author": "tickle122",
+            "votes": 4,
+            "created_at": "2021-01-18T10:09:05.410Z"
+          }
+        }
+      },
+      {
+        "requestBody": {
+          "inc_votes": -1
+        },
+        "examplePayload": {
+          "review": {
+            "comment": {
+              "comment_id": 2,
+              "body": "My dog loved this game too!",
+              "review_id": 4,
+              "author": "tickle122",
+              "votes": 3,
+              "created_at": "2021-01-18T10:09:05.410Z"
+            }
+          }
+        }
+      }
+    ]
   },
   "GET /api/users": {
     "description": "serves an array of all users",
