@@ -12,10 +12,24 @@ const selectCommentsByReviewId = async (review_id) => {
   return comments;
 };
 
+const selectCommentById = async (comment_id) => {
+  const { rows, rowCount } = await db.query(
+    `SELECT * FROM comments 
+     WHERE comment_id = $1;`,
+    [comment_id]
+  );
+
+  if (rowCount === 0)
+    throw new CustomError(404, `Comment with id '${comment_id}' not found`);
+
+  return rows[0];
+};
+
 const insertCommentByReviewId = async (review_id, comment) => {
   const { username: author, body } = comment;
 
-  if (body !== undefined && body.length === 0) throw new CustomError(400, "Comment cannot be empty");
+  if (body !== undefined && body.length === 0)
+    throw new CustomError(400, "Comment cannot be empty");
 
   const { rows: result } = await db.query(
     `
@@ -28,4 +42,19 @@ const insertCommentByReviewId = async (review_id, comment) => {
   return result[0];
 };
 
-module.exports = { selectCommentsByReviewId, insertCommentByReviewId };
+const deleteCommentFromCommentsById = async (comment_id) => {
+  const { rows } = await db.query(
+    `DELETE FROM comments 
+     WHERE comment_id = $1;`,
+    [comment_id]
+  );
+
+  return rows;
+};
+
+module.exports = {
+  selectCommentsByReviewId,
+  insertCommentByReviewId,
+  selectCommentById,
+  deleteCommentFromCommentsById,
+};
