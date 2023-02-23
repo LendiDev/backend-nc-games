@@ -1,59 +1,99 @@
 # Northcoders House of Games API
 
-### Description
+This is RESTful API for NC House of Games Front-End that designed to serve reviews, comments, users, categories related to board games. The API is built using NodeJS, Express, PostgreSQL, and is designed to be fast, scalable, and easy to use.
 
-This is an API for the purpose of accessing application data programmatically. The intention here is to mimic the building of a real world backend service (such as reddit) which should provide this information to the front end architecture.
+The users can access reviews on board games from other users and comments on those reviews. They can also post and delete comments for the reviews.
 
-This API is using PSQL, and interaction with it using [node-postgres](https://node-postgres.com/).
+## Hosted Version
 
-### 1. Setting up the Environment
+You can access the hosted version of this API at https://nc-games.lendi.dev/api
 
-Before running the application or tests, you should ensure that all dependencies are installed by running the following command:
+### Prerequisites
 
-```
-npm install
-```
+This API was developed and tested using:
 
-This will install all required dependencies for the project.
+* Node.js v19.2.0
+* Postgres v14.6
 
-### 2. Setting up the Environment Variables
+Before you start, you should have the following installed on your machine:
 
-To run this project locally, you will need to set up environment variables for the two databases. The necessary environment variables need to be defined in two files named ***.env.development*** and ***.env.test***, and need to be located in the root folder of the repo.
+* You can download Node.js from the official website: https://nodejs.org/.
+* You can download Postgres from the official website: https://www.postgresql.org/.
 
-You should first make a copy of the example environment file ***.env-example*** and rename it to ***.env.development*** and ***.env.test*** respectively.
+### Getting started
 
-Next, open the ***.env.development*** and ***.env.test*** files and replace database_name_here with the name of your databases for each environment variable **PGDATABASE**.
+To install and run this API locally, follow these steps:
 
-The **PGDATABASE** environment variable defines the name of the database that the application will use for each environment. The difference between the development and test databases is that the development database is used to store data during the development process, while the test database is used to run automated tests against the application.
+1. Clone the repository to your local machine:
 
-Here's an example content of ***.env.development*** and ***.env.test*** files should look like:
+    ```sh
+    git clone https://github.com/LendiDev/backend-nc-games.git
+    ```
 
-***.env.development***
-```
-PGDATABASE=<development_database_name>
-```
+2. Install the dependencies using `npm`:
 
-***.env.test***
-```
-PGDATABASE=<test_database_name>
-```
+    ```sh
+    cd backend-nc-games
+    npm install
+    ```
 
-For security reasons, you should never commit your environment variables to your code repository, which is why the ***.env.**** files are added to the ***.gitignore*** file.
+3. Set up environment variables:
 
-### 3. Setting up the Databases
+* Create two files named `.env.development` and ```.env.test``` in the root folder of the cloned repository and add **PGDATABASE** environment variable in each file with the names of your databases for development and testing. 
 
-To set up the development and test databases, you need to use the following command:
+  The example of file content can be found in ```.env-example```. 
 
-```
-npm run setup-dbs
-```
 
-This command will create the necessary databases using the names specified in the ***.env.development*** and ***.env.test*** files.
+  Or here is an example of files ```.env.development``` and ```.env.test``` how they should look like:
 
-### 4. Seeding the Databases
+    ***.env.development***
+    ```
+    PGDATABASE=database_name
+    ```
 
-In order to seed the development database with some initial data, you need to use the following command:
+    ***.env.test***
+    ```
+    PGDATABASE=database_name_test
+    ```
 
-```
-npm run seed
-```
+
+4. Set up the databases:
+
+* Update the database names in `./db/setup.sql` according to your environment variables.
+
+* Make sure that you have **PostgresSQL** installed and it is running on your local machine.
+
+* Create local databases using `npm`:
+
+    ```sh
+    npm run setup-dbs
+    ```
+
+* Seed the local database with some sample data:
+
+    ```sh
+    npm run seed
+    ```
+
+5. Now you can start a server using:
+
+    ```sh
+    npm start
+    ```
+
+   The API should now be running at http://localhost:9090.
+    
+
+### Testing
+
+To run the tests for this API, follow this step:
+
+
+* Run the tests using `npm`:
+
+    ```sh
+    npm test
+    ```
+
+   The tests should now be run, and you should see the results in the console.
+
