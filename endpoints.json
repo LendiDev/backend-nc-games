@@ -1,15 +1,26 @@
 {
   "GET /api": {
-    "description": "serves up a json representation of all the available endpoints of the api"
+    "description": "serves up a json representation of all the available endpoints of the api",
+    "queries": [],
+    "onSuccessStatusCode": 200,
+    "examplePayload": {
+      "GET /api": {
+        "description": "serves up a json representation of all the available endpoints of the api",
+        "queries": [],
+        "onSuccessStatusCode": 200,
+        "examplePayload": ""
+      }
+    }
   },
   "GET /api/categories": {
     "description": "serves an array of all categories",
     "queries": [],
-    "exampleResponse": {
+    "onSuccessStatusCode": 200,
+    "examplePayload": {
       "categories": [
         {
-          "description": "Players attempt to uncover each other's hidden role",
-          "slug": "Social deduction"
+          "slug": "Social deduction",
+          "description": "Players attempt to uncover each other's hidden role"
         }
       ]
     }
@@ -17,16 +28,119 @@
   "GET /api/reviews": {
     "description": "serves an array of all reviews",
     "queries": ["category", "sort_by", "order"],
-    "exampleResponse": {
+    "onSuccessStatusCode": 200,
+    "examplePayload": {
       "reviews": [
         {
-          "title": "One Night Ultimate Werewolf",
-          "designer": "Akihisa Okui",
-          "owner": "happyamy2016",
-          "review_img_url": "https://images.pexels.com/photos/5350049/pexels-photo-5350049.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260",
-          "category": "hidden-roles",
-          "created_at": 1610964101251,
-          "votes": 5
+          "review_id": 8,
+          "title": "Scythe; you're gonna need a bigger table!",
+          "category": "engine-building",
+          "designer": "Jamey Stegmaier",
+          "owner": "grumpy19",
+          "review_body": "Spend 30 minutes just setting up all of the boards ...",
+          "review_img_url": "https://images.pexels.com/photos/4200740/pexels-photo-4200740.jpeg?w=700&h=700",
+          "created_at": "2021-01-22T10:37:04.839Z",
+          "votes": 100,
+          "comment_count": 1
+        }
+      ]
+    }
+  },
+  "GET /api/reviews/:review_id": {
+    "description": "serves a review defined by review id",
+    "queries": [],
+    "onSuccessStatusCode": 200,
+    "examplePayload": {
+      "review": {
+        "review_id": 8,
+        "title": "Scythe; you're gonna need a bigger table!",
+        "category": "engine-building",
+        "designer": "Jamey Stegmaier",
+        "owner": "grumpy19",
+        "review_body": "Spend 30 minutes just setting up all of the boards ...",
+        "review_img_url": "https://images.pexels.com/photos/4200740/pexels-photo-4200740.jpeg?w=700&h=700",
+        "created_at": "2021-01-22T10:37:04.839Z",
+        "votes": 100,
+        "comment_count": 1
+      }
+    }
+  },
+  "PATCH /api/reviews/:review_id": {
+    "description": "updates votes for a review defined by review id",
+    "queries": [],
+    "onSuccessStatusCode": 200,
+    "exampleRequests": [
+      {
+        "requestBody": {
+          "inc_votes": 1
+        },
+        "examplePayload": {
+          "review": {
+            "review_id": 8,
+            "title": "Scythe; you're gonna need a bigger table!",
+            "category": "engine-building",
+            "designer": "Jamey Stegmaier",
+            "owner": "grumpy19",
+            "review_body": "Spend 30 minutes just setting up all of the boards ...",
+            "review_img_url": "https://images.pexels.com/photos/4200740/pexels-photo-4200740.jpeg?w=700&h=700",
+            "created_at": "2021-01-22T10:37:04.839Z",
+            "votes": 101
+          }
+        }
+      },
+      {
+        "requestBody": {
+          "inc_votes": -2
+        },
+        "examplePayload": {
+          "review": {
+            "review_id": 8,
+            "title": "Scythe; you're gonna need a bigger table!",
+            "category": "engine-building",
+            "designer": "Jamey Stegmaier",
+            "owner": "grumpy19",
+            "review_body": "Spend 30 minutes just setting up all of the boards ...",
+            "review_img_url": "https://images.pexels.com/photos/4200740/pexels-photo-4200740.jpeg?w=700&h=700",
+            "created_at": "2021-01-22T10:37:04.839Z",
+            "votes": 98
+          }
+        }
+      }
+    ]
+  },
+  "GET /api/reviews/:review_id/comments": {
+    "description": "serves an array of comments for a review defined by review id",
+    "queries": [],
+    "onSuccessStatusCode": 200,
+    "examplePayload": {
+      "comments": [
+        {
+          "comment_id": 7,
+          "body": "Quis duis mollit ad enim deserunt.",
+          "review_id": 8,
+          "author": "jessjelly",
+          "votes": 3,
+          "created_at": "2021-03-27T19:48:58.110Z"
+        }
+      ]
+    }
+  },
+  "DELETE /api/comments/:comment_id": {
+    "description": "deletes a comment defined by comment id",
+    "queries": [],
+    "onSuccessStatusCode": 204,
+    "examplePayload": ""
+  },
+  "GET /api/users": {
+    "description": "serves an array of all users",
+    "queries": [],
+    "onSuccessStatusCode": 200,
+    "examplePayload": {
+      "users": [
+        {
+          "username": "tickle122",
+          "name": "Tom Tickle",
+          "avatar_url": "https://vignette.wikia.nocookie.net/mrmen/images/d/d6/Mr-Tickle-9a.png/revision/latest?cb=20180127221953"
         }
       ]
     }
