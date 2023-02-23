@@ -1,10 +1,11 @@
 const express = require("express");
 const {
-  notFoundErrorsHandler,
-  customErrorsHandler,
-  psqlErrorsHandler,
-  internalErrorsHandler,
-} = require("./controllers/error-handlers.controller");
+  notFoundErrorHandler,
+  customErrorHandler,
+  psqlErrorHandler,
+  internalErrorHandler,
+} = require("./middlewares/error-handlers.middleware");
+const { getEndpoints } = require("./controllers/api.controller");
 const categoriesRouter = require("./routers/categories.router");
 const reviewsRouter = require("./routers/reviews.router");
 const usersRouter = require("./routers/users.router");
@@ -13,15 +14,12 @@ const app = express();
 
 app.use(express.json());
 
-app.use('/api/categories', categoriesRouter);
-app.use('/api/reviews', reviewsRouter);
-app.use('/api/users', usersRouter);
+app.get("/api", getEndpoints);
+app.use("/api/categories", categoriesRouter);
+app.use("/api/reviews", reviewsRouter);
+app.use("/api/users", usersRouter);
 
-app.use(
-  notFoundErrorsHandler,
-  customErrorsHandler,
-  psqlErrorsHandler,
-  internalErrorsHandler
-);
+app.all("/*", notFoundErrorHandler);
+app.use(customErrorHandler, psqlErrorHandler, internalErrorHandler);
 
 module.exports = app;
