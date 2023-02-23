@@ -754,7 +754,7 @@ describe("app", () => {
         test("400 - responds with message 'Bad request' when review doesn't exist", () => {
           const reviewId = 999999999;
           const comment = {
-            username: "mallionaire2222",
+            username: "mallionaire",
             body: "Amazing board game!",
           };
           return request(app)
@@ -768,10 +768,10 @@ describe("app", () => {
             });
         });
 
-        test("400 - responds with message 'Bad request' when review _id is wrong type", () => {
+        test("400 - responds with message 'Bad request' when review_id is wrong type", () => {
           const reviewId = "okokokok";
           const comment = {
-            username: "mallionaire2222",
+            username: "mallionaire",
             body: "Amazing board game!",
           };
           return request(app)
@@ -840,7 +840,7 @@ describe("app", () => {
     });
   });
 
-  describe.only("/api/users/:username", () => {
+  describe("/api/users/:username", () => {
     describe("GET", () => {
       describe("Successful Responses", () => {
         test("200 - responds with a user object defined by username", () => {
@@ -863,12 +863,14 @@ describe("app", () => {
 
       describe("Unsuccessful Responses", () => {
         test("404 - response with message 'User with username '...' not found' when username doesn't exist", () => {
-          const username = 'lol';
+          const username = "lol";
           return request(app)
             .get(`/api/users/${username}`)
             .expect(404)
-            .then(({ body: {message} }) => {
-              expect(message).toBe(`User with username '${username}' not found`);
+            .then(({ body: { message } }) => {
+              expect(message).toBe(
+                `User with username '${username}' not found`
+              );
             });
         });
       });
@@ -900,6 +902,157 @@ describe("app", () => {
           const commentId = "first one";
           return request(app)
             .delete(`/api/comments/${commentId}`)
+            .expect(400)
+            .then(({ body: { message } }) => {
+              expect(message).toBe("Bad request");
+            });
+        });
+      });
+    });
+
+    describe("PATCH", () => {
+      describe("Successful Responses", () => {
+        test("200 - responds with updated comment when increase votes", () => {
+          const commentId = 4;
+          const patchObject = {
+            inc_votes: 1,
+          };
+          return request(app)
+            .patch(`/api/comments/${commentId}`)
+            .send(patchObject)
+            .expect(200)
+            .then(({ body: {comment} }) => {
+              expect(comment).toEqual(
+                expect.objectContaining({
+                  comment_id: commentId,
+                  body: expect.any(String),
+                  review_id: expect.any(Number),
+                  author: expect.any(String),
+                  votes: 17,
+                  created_at: expect.any(String),
+                })
+              );
+            });
+        });
+
+        test("200 - responds with updated comment when decrease votes by passing negative inc_votes as a body object", () => {
+          const commentId = 4;
+          const patchObject = {
+            inc_votes: -1,
+          };
+          return request(app)
+            .patch(`/api/comments/${commentId}`)
+            .send(patchObject)
+            .expect(200)
+            .then(({ body: {comment} }) => {
+              expect(comment).toEqual(
+                expect.objectContaining({
+                  comment_id: commentId,
+                  body: expect.any(String),
+                  review_id: expect.any(Number),
+                  author: expect.any(String),
+                  votes: 15,
+                  created_at: expect.any(String),
+                })
+              );
+            });
+        });
+      });
+
+      describe("Unsuccessful Responses", () => {
+        test("400 - response with message 'Bad request' when empty body passed in", () => {
+          const commentId = 4;
+          const patchObject = "";
+          return request(app)
+            .patch(`/api/comments/${commentId}`)
+            .send(patchObject)
+            .expect(400)
+            .then(({ body: { message } }) => {
+              expect(message).toBe("Bad request");
+            });
+        });
+        test("400 - response with message 'Bad request' when empty body object passed in", () => {
+          const commentId = 4;
+          const patchObject = {};
+          return request(app)
+            .patch(`/api/comments/${commentId}`)
+            .send(patchObject)
+            .expect(400)
+            .then(({ body: { message } }) => {
+              expect(message).toBe("Bad request");
+            });
+        });
+
+        test("404 - response with message 'Comment with id '999999' not found' when request is valid but comment doesn't exist", () => {
+          const commentId = 999999;
+          const patchObject = "";
+          return request(app)
+            .patch(`/api/comments/${commentId}`)
+            .send(patchObject)
+            .expect(404)
+            .then(({ body: { message } }) => {
+              expect(message).toBe(`Comment with id '${commentId}' not found`);
+            });
+        });
+
+        test("400 - response with message 'Bad request' when comment_id is wrong type but patch object is valid", () => {
+          const commentId = "first";
+          const patchObject = {
+            inc_votes: -1,
+          };
+          return request(app)
+            .patch(`/api/comments/${commentId}`)
+            .send(patchObject)
+            .expect(400)
+            .then(({ body: { message } }) => {
+              expect(message).toBe(`Bad request`);
+            });
+        });
+
+        test("400 - response with message 'Bad request' when increase by more than 1", () => {
+          const commentId = 4;
+          const patchObject = {
+            inc_votes: 5,
+          };
+          return request(app)
+            .patch(`/api/comments/${commentId}`)
+            .send(patchObject)
+            .expect(400)
+            .then(({ body: { message } }) => {
+              expect(message).toBe(`Votes only permitted to be changed by 1 or -1`);
+            });
+        });
+
+        test("400 - response with message 'Bad request' when decrease by more than 1", () => {
+          const commentId = 4;
+          const patchObject = {
+            inc_votes: 5,
+          };
+          return request(app)
+            .patch(`/api/comments/${commentId}`)
+            .send(patchObject)
+            .expect(400)
+            .then(({ body: { message } }) => {
+              expect(message).toBe(`Votes only permitted to be changed by 1 or -1`);
+            });
+        });
+
+        test("400 - response with message 'Bad request' when no object has been send", () => {
+          const commentId = 4;
+          return request(app)
+            .patch(`/api/comments/${commentId}`)
+            .expect(400)
+            .then(({ body: { message } }) => {
+              expect(message).toBe("Bad request");
+            });
+        });
+
+        test("400 - response with message 'Bad request' when body object has inc_votes with wrong data type", () => {
+          const commentId = 4;
+          const patchObject = { inc_votes: "by 2" };
+          return request(app)
+            .patch(`/api/comments/${commentId}`)
+            .send(patchObject)
             .expect(400)
             .then(({ body: { message } }) => {
               expect(message).toBe("Bad request");
