@@ -813,7 +813,18 @@ describe("app", () => {
           .get("/api/non-existent-endpoint")
           .expect(404)
           .then(({ body }) => {
-            expect(body).toHaveProperty("message", "Not Found");
+            expect(body).toHaveProperty("message", "GET /api/non-existent-endpoint not found");
+          });
+      });
+    });
+
+    describe("POST", () => {
+      test("404 - should response with 'Not Found' message", () => {
+        return request(app)
+          .post("/api/post_it")
+          .expect(404)
+          .then(({ body }) => {
+            expect(body).toHaveProperty("message", "POST /api/post_it not found");
           });
       });
     });
