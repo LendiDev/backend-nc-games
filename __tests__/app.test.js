@@ -29,7 +29,6 @@ describe("app", () => {
             .get("/api")
             .expect(200)
             .then(({ body, header }) => {
-
               expect(typeof body).toBe("object");
               expect(header["content-type"]).toBe(
                 "application/json; charset=utf-8"
@@ -37,11 +36,19 @@ describe("app", () => {
 
               const endpoints = Object.entries(body);
               expect(endpoints.length).toBeGreaterThan(0);
+
               endpoints.forEach(([value, object]) => {
-                console.log(value);
                 expect(typeof value).toBe("string");
                 expect(typeof object).toBe("object");
-              })
+
+                expect(object).toEqual(
+                  expect.objectContaining({
+                    description: expect.any(String),
+                    queries: expect.any(Array),
+                    onSuccessStatusCode: expect.any(Number),
+                  })
+                );
+              });
             });
         });
       });
