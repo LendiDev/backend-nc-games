@@ -21,6 +21,33 @@ afterAll(() => {
 });
 
 describe("app", () => {
+  describe("/api", () => {
+    describe("GET", () => {
+      describe("Successful Responses", () => {
+        test.only("200 - responds with API endpoints in JSON format", () => {
+          return request(app)
+            .get("/api")
+            .expect(200)
+            .then(({ body, header }) => {
+
+              expect(typeof body).toBe("object");
+              expect(header["content-type"]).toBe(
+                "application/json; charset=utf-8"
+              );
+
+              const endpoints = Object.entries(body);
+              expect(endpoints.length).toBeGreaterThan(0);
+              endpoints.forEach(([value, object]) => {
+                console.log(value);
+                expect(typeof value).toBe("string");
+                expect(typeof object).toBe("object");
+              })
+            });
+        });
+      });
+    });
+  });
+
   describe("/api/categories", () => {
     describe("GET", () => {
       describe("Successful Responses", () => {
@@ -508,7 +535,7 @@ describe("app", () => {
         });
 
         test("400 - response with message 'Bad request' when review_id is wrong type but patch object is valid", () => {
-          const reviewId = 'twentyTwo';
+          const reviewId = "twentyTwo";
           const patchObject = {
             inc_votes: 5,
           };
@@ -813,7 +840,10 @@ describe("app", () => {
           .get("/api/non-existent-endpoint")
           .expect(404)
           .then(({ body }) => {
-            expect(body).toHaveProperty("message", "GET /api/non-existent-endpoint not found");
+            expect(body).toHaveProperty(
+              "message",
+              "GET /api/non-existent-endpoint not found"
+            );
           });
       });
     });
@@ -824,7 +854,10 @@ describe("app", () => {
           .post("/api/post_it")
           .expect(404)
           .then(({ body }) => {
-            expect(body).toHaveProperty("message", "POST /api/post_it not found");
+            expect(body).toHaveProperty(
+              "message",
+              "POST /api/post_it not found"
+            );
           });
       });
     });
