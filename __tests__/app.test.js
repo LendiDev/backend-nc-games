@@ -806,34 +806,31 @@ describe("app", () => {
     });
   });
 
-  describe.skip("/comments/:comment_id", () => {
+  describe("/api/comments/:comment_id", () => {
     describe("DELETE", () => {
       describe("Successful Responses", () => {
         test("204 - responds with no content on successful deletion", () => {
           const commentId = 1;
           return request(app)
-            .delete(`/comments/${commentId}`)
-            .expect(404)
-            .then(({ body }) => {
-              expect(body).toHaveLength(0);
-            });
+            .delete(`/api/comments/${commentId}`)
+            .expect(204, '')
         });
       });
       describe("Unsuccessful Responses", () => {
         test("404 - responds with error message 'Comment not found' when valid comment_id passed in but non-existent comment", () => {
           const commentId = 999999999;
           return request(app)
-            .delete(`/comments/${commentId}`)
+            .delete(`/api/comments/${commentId}`)
             .expect(404)
             .then(({ body: {message} }) => {
-              expect(message).toBe('Comment not found');
+              expect(message).toBe(`Comment with id '${commentId}' not found`);
             });
         });
 
         test("400 - responds with error message 'Bad request' when invalid comment_id passed in", () => {
           const commentId = 'first one';
           return request(app)
-            .delete(`/comments/${commentId}`)
+            .delete(`/api/comments/${commentId}`)
             .expect(400)
             .then(({ body: {message} }) => {
               expect(message).toBe('Bad request');
