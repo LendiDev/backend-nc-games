@@ -840,6 +840,41 @@ describe("app", () => {
     });
   });
 
+  describe.only("/api/users/:username", () => {
+    describe("GET", () => {
+      describe("Successful Responses", () => {
+        test("200 - responds with a user object defined by username", () => {
+          const username = "bainesface";
+          return request(app)
+            .get(`/api/users/${username}`)
+            .expect(200)
+            .then(({ body: { user } }) => {
+              expect(user).toEqual(
+                expect.objectContaining({
+                  username: "bainesface",
+                  name: "sarah",
+                  avatar_url:
+                    "https://avatars2.githubusercontent.com/u/24394918?s=400&v=4",
+                })
+              );
+            });
+        });
+      });
+
+      describe("Unsuccessful Responses", () => {
+        test("404 - response with message 'User with username '...' not found' when username doesn't exist", () => {
+          const username = 'lol';
+          return request(app)
+            .get(`/api/users/${username}`)
+            .expect(404)
+            .then(({ body: {message} }) => {
+              expect(message).toBe(`User with username '${username}' not found`);
+            });
+        });
+      });
+    });
+  });
+
   describe("/api/comments/:comment_id", () => {
     describe("DELETE", () => {
       describe("Successful Responses", () => {
@@ -847,7 +882,7 @@ describe("app", () => {
           const commentId = 1;
           return request(app)
             .delete(`/api/comments/${commentId}`)
-            .expect(204, '')
+            .expect(204, "");
         });
       });
       describe("Unsuccessful Responses", () => {
@@ -856,18 +891,18 @@ describe("app", () => {
           return request(app)
             .delete(`/api/comments/${commentId}`)
             .expect(404)
-            .then(({ body: {message} }) => {
+            .then(({ body: { message } }) => {
               expect(message).toBe(`Comment with id '${commentId}' not found`);
             });
         });
 
         test("400 - responds with error message 'Bad request' when invalid comment_id passed in", () => {
-          const commentId = 'first one';
+          const commentId = "first one";
           return request(app)
             .delete(`/api/comments/${commentId}`)
             .expect(400)
-            .then(({ body: {message} }) => {
-              expect(message).toBe('Bad request');
+            .then(({ body: { message } }) => {
+              expect(message).toBe("Bad request");
             });
         });
       });
