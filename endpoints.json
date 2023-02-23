@@ -144,5 +144,17 @@
         }
       ]
     }
+  },
+  "GET /api/users/:username": {
+    "description": "serves a user details defined by username",
+    "queries": [],
+    "onSuccessStatusCode": 200,
+    "examplePayload": {
+      "user": {
+        "username": "bainesface",
+        "name": "sarah",
+        "avatar_url": "https://avatars2.githubusercontent.com/u/24394918?s=400&v=4"
+      }
+    }
   }
 }
