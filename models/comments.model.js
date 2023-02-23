@@ -42,6 +42,25 @@ const insertCommentByReviewId = async (review_id, comment) => {
   return result[0];
 };
 
+const updateComment = async (comment_id, patchObject) => {
+  const { inc_votes } = patchObject;
+
+  if ((inc_votes && inc_votes > 1) || inc_votes < -1 || inc_votes === 0) {
+    throw new CustomError(400, "Votes only permitted to be changed by 1 or -1");
+  }
+
+  const { rows } = await db.query(
+    `
+      UPDATE comments 
+      SET votes = votes + $2
+      WHERE comment_id = $1
+      RETURNING *`,
+    [comment_id, inc_votes]
+  );
+
+  return rows[0];
+};
+
 const deleteCommentFromCommentsById = async (comment_id) => {
   const { rows } = await db.query(
     `DELETE FROM comments 
@@ -57,4 +76,5 @@ module.exports = {
   insertCommentByReviewId,
   selectCommentById,
   deleteCommentFromCommentsById,
+  updateComment,
 };
