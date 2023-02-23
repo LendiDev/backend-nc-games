@@ -49,15 +49,14 @@ To install and run this API locally, follow these steps:
 
    The example of file content can be found in ```.env-example```. 
 
+    Or here is an example how they should look like:
 
-    Or here is an example of files ```.env.development``` and ```.env.test``` how they should look like:
-
-    ***.env.development***
+    `.env.development`
     ```
     PGDATABASE=database_name
     ```
 
-    ***.env.test***
+    `.env.test`
     ```
     PGDATABASE=database_name_test
     ```
