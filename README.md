@@ -1,5 +1,7 @@
 # Northcoders House of Games API
 
+<br/>
+
 This is RESTful API for NC House of Games Front-End that designed to serve reviews, comments, users, categories related to board games. The API is built using NodeJS, Express, PostgreSQL, and is designed to be fast, scalable, and easy to use.
 
 The users can access reviews on board games from other users and comments on those reviews. They can also post and delete comments for the reviews.
@@ -60,7 +62,6 @@ To install and run this API locally, follow these steps:
     ```
     PGDATABASE=database_name_test
     ```
-
 
 4. Set up the databases:
 
