@@ -1,5 +1,7 @@
 # Northcoders House of Games API
 
+![Units tests and E2E tests workflow](https://github.com/LendiDev/backend-nc-games/actions/workflows/run-tests.yml/badge.svg)
+
 <br/>
 
 This is RESTful API for NC House of Games Front-End that designed to serve reviews, comments, users, categories related to board games. The API is built using NodeJS, Express, PostgreSQL, and is designed to be fast, scalable, and easy to use.

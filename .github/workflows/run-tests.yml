@@ -1,7 +1,5 @@
-name: Run Tests
+name: Unit tests and E2E tests
 on:
-  push:
-    branches: [main, ci-cd]
   pull_request:
     branches: [main]
 jobs:
