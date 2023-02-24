@@ -29,9 +29,9 @@ const postCommentByReviewId = async (req, res, next) => {
       await checkIsExistsIn("users", "username", commentToPost.username, "User");
     }
 
-    const comment = await insertCommentByReviewId(review_id, commentToPost);
+    const insertedComment = await insertCommentByReviewId(review_id, commentToPost);
 
-    res.status(201).send({ comment });
+    res.status(201).send({ insertedComment });
   } catch (err) {
     next(err);
   }
@@ -43,9 +43,9 @@ const patchComment = async (req, res, next) => {
 
   try {
     await checkIsExistsIn("comments", "comment_id", comment_id, "Comment");
-    const comment = await updateComment(comment_id, patchObject);
+    const updatedComment = await updateComment(comment_id, patchObject);
 
-    res.status(200).send({ comment });
+    res.status(200).send({ updatedComment });
   } catch (err) {
     next(err);
   }

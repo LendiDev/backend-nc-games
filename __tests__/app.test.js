@@ -455,7 +455,6 @@ describe("app", () => {
               );
             });
         });
-
         test("400 - responds with custom error message when query is valid but a value of limit is negative", () => {
           return request(app)
             .get(
@@ -468,7 +467,30 @@ describe("app", () => {
               );
             });
         });
-
+        test("400 - responds with custom error message when query is valid but a value of limit is 0", () => {
+          return request(app)
+            .get(
+              `/api/reviews?category=dexterity&sort_by=owner&order=ASC&limit=0`
+            )
+            .expect(400)
+            .then(({ body: { message } }) => {
+              expect(message).toBe(
+                `Invalid query value of 'limit' parameter. Positive number is only permitted`
+              );
+            });
+        });
+        test("400 - responds with custom error message when query is valid but a value of p is negative", () => {
+          return request(app)
+            .get(
+              `/api/reviews?category=dexterity&sort_by=owner&order=ASC&p=0&limit=10`
+            )
+            .expect(400)
+            .then(({ body: { message } }) => {
+              expect(message).toBe(
+                `Invalid query value of 'p' parameter. Positive number is only permitted`
+              );
+            });
+        });
         test("400 - responds with custom error message when query is valid but a value of p is negative", () => {
           return request(app)
             .get(
@@ -481,7 +503,18 @@ describe("app", () => {
               );
             });
         });
-
+        test("400 - responds with custom error message when query is valid but a value of p is 0", () => {
+          return request(app)
+            .get(
+              `/api/reviews?category=dexterity&sort_by=owner&order=ASC&p=0&limit=10`
+            )
+            .expect(400)
+            .then(({ body: { message } }) => {
+              expect(message).toBe(
+                `Invalid query value of 'p' parameter. Positive number is only permitted`
+              );
+            });
+        });
         test("400 - responds with custom error message when p is out of range", () => {
           return request(app)
             .get(
@@ -489,9 +522,7 @@ describe("app", () => {
             )
             .expect(400)
             .then(({ body: { message } }) => {
-              expect(message).toBe(
-                `Page is out of range`
-              );
+              expect(message).toBe(`Page is out of range`);
             });
         });
       });
@@ -513,8 +544,8 @@ describe("app", () => {
             .post("/api/reviews")
             .send(newReview)
             .expect(201)
-            .then(({ body: { review } }) => {
-              expect(review).toEqual(
+            .then(({ body: { insertedReview } }) => {
+              expect(insertedReview).toEqual(
                 expect.objectContaining({
                   ...expectedReviewShape,
                   ...newReview,
@@ -523,7 +554,6 @@ describe("app", () => {
               );
             });
         });
-
         test("201 - responds with a newly added review", () => {
           const newReview = {
             owner: "mallionaire",
@@ -538,8 +568,8 @@ describe("app", () => {
             .post("/api/reviews")
             .send(newReview)
             .expect(201)
-            .then(({ body: { review } }) => {
-              expect(review).toEqual(
+            .then(({ body: { insertedReview } }) => {
+              expect(insertedReview).toEqual(
                 expect.objectContaining({
                   ...expectedReviewShape,
                   ...newReview,
@@ -561,8 +591,8 @@ describe("app", () => {
             .post("/api/reviews")
             .send(newReview)
             .expect(201)
-            .then(({ body: { review } }) => {
-              expect(review).toEqual(
+            .then(({ body: { insertedReview } }) => {
+              expect(insertedReview).toEqual(
                 expect.objectContaining({
                   ...expectedReviewShape,
                   ...newReview,
@@ -605,7 +635,6 @@ describe("app", () => {
               );
             });
         });
-
         test("404 - responds with custom not found error message when valid object passed in but category does not exists", () => {
           const newReview = {
             owner: "mallionaire",
@@ -625,7 +654,6 @@ describe("app", () => {
               );
             });
         });
-
         test("400 - responds with custom error message when when valid object passed in but review body is less then 20 characters", () => {
           const newReview = {
             owner: "mallionaire",
@@ -644,7 +672,6 @@ describe("app", () => {
               );
             });
         });
-
         test("400 - responds with custom error message when when valid object passed in but review title is less then 3 characters", () => {
           const newReview = {
             owner: "mallionaire",
@@ -664,7 +691,6 @@ describe("app", () => {
               );
             });
         });
-
         test("400 - responds with custom error message when when valid object passed in but designer field is less then 2 characters", () => {
           const newReview = {
             owner: "mallionaire",
@@ -704,15 +730,12 @@ describe("app", () => {
               );
             });
         });
-
         test("200 - responds with a review object including comment_count by review_id", () => {
           const reviewId = 2;
           return request(app)
             .get(`/api/reviews/${reviewId}`)
             .expect(200)
-            .then(({ body }) => {
-              const { review } = body;
-
+            .then(({ body: { review } }) => {
               expect(review).toEqual(
                 expect.objectContaining({
                   review_id: reviewId,
@@ -751,7 +774,9 @@ describe("app", () => {
             .then(({ body }) => {
               const { message } = body;
 
-              expect(message).toBe(`Review with review_id '${reviewId}' not found`);
+              expect(message).toBe(
+                `Review with review_id '${reviewId}' not found`
+              );
             });
         });
       });
@@ -768,10 +793,8 @@ describe("app", () => {
             .patch(`/api/reviews/${reviewId}`)
             .send(patchObject)
             .expect(200)
-            .then(({ body }) => {
-              const { review } = body;
-
-              expect(review).toEqual(
+            .then(({ body: { updatedReview } }) => {
+              expect(updatedReview).toEqual(
                 expect.objectContaining({
                   review_id: reviewId,
                   title: expect.any(String),
@@ -786,7 +809,6 @@ describe("app", () => {
               );
             });
         });
-
         test("200 - responds with updated review when decrease votes by passing negative inc_votes as a body object", () => {
           const reviewId = 2;
           const patchObject = {
@@ -796,10 +818,8 @@ describe("app", () => {
             .patch(`/api/reviews/${reviewId}`)
             .send(patchObject)
             .expect(200)
-            .then(({ body }) => {
-              const { review } = body;
-
-              expect(review).toEqual(
+            .then(({ body: { updatedReview } }) => {
+              expect(updatedReview).toEqual(
                 expect.objectContaining({
                   review_id: reviewId,
                   title: expect.any(String),
@@ -843,7 +863,6 @@ describe("app", () => {
               expect(message).toBe("Bad request");
             });
         });
-
         test("404 - responds with custom not found error message when request is valid but review doesn't exist", () => {
           const reviewId = 9999999;
           const patchObject = "";
@@ -859,7 +878,6 @@ describe("app", () => {
               );
             });
         });
-
         test("400 - responds with message 'Bad request' when review_id is wrong type but patch object is valid", () => {
           const reviewId = "twentyTwo";
           const patchObject = {
@@ -875,7 +893,6 @@ describe("app", () => {
               expect(message).toBe("Bad request");
             });
         });
-
         test("400 - responds with message 'Bad request' when no object has been send", () => {
           const reviewId = 2;
           return request(app)
@@ -887,7 +904,6 @@ describe("app", () => {
               expect(message).toBe("Bad request");
             });
         });
-
         test("400 - responds with message 'Bad request' when body object has inc_votes with wrong data type", () => {
           const reviewId = 2;
           const patchObject = { inc_votes: "plus2" };
@@ -913,9 +929,7 @@ describe("app", () => {
           return request(app)
             .get(`/api/reviews/${reviewId}/comments`)
             .expect(200)
-            .then(({ body }) => {
-              const { comments } = body;
-
+            .then(({ body: { comments } }) => {
               comments.forEach((comment) => {
                 expect(comment).toMatchObject({
                   comment_id: expect.any(Number),
@@ -933,7 +947,6 @@ describe("app", () => {
               });
             });
         });
-
         test("200 - responds with empty array of comments when review_id does exist but has no comments", () => {
           const reviewId = 1;
           return request(app)
@@ -957,7 +970,6 @@ describe("app", () => {
               expect(message).toBe("Bad request");
             });
         });
-
         test("404 - responds with message 'Review not found' when review_id doesn't exist", () => {
           const reviewId = 99999999;
           return request(app)
@@ -985,10 +997,8 @@ describe("app", () => {
             .post(`/api/reviews/${reviewId}/comments`)
             .send(commentToPost)
             .expect(201)
-            .then(({ body }) => {
-              const { comment } = body;
-
-              expect(comment).toMatchObject({
+            .then(({ body: { insertedComment } }) => {
+              expect(insertedComment).toMatchObject({
                 comment_id: 7,
                 votes: 0,
                 created_at: expect.any(String),
@@ -1012,7 +1022,6 @@ describe("app", () => {
               expect(message).toBe("Bad request");
             });
         });
-
         test("400 - responds with message 'Bad request' when missing all required fields", () => {
           const reviewId = 1;
           return request(app)
@@ -1025,7 +1034,6 @@ describe("app", () => {
               expect(message).toBe("Bad request");
             });
         });
-
         test("400 - responds with message 'Bad request' when missing username field", () => {
           const reviewId = 1;
           const comment = {
@@ -1041,7 +1049,6 @@ describe("app", () => {
               expect(message).toBe("Bad request");
             });
         });
-
         test("400 - responds with message 'Bad request' when missing body field", () => {
           const reviewId = 1;
           const comment = {
@@ -1057,7 +1064,6 @@ describe("app", () => {
               expect(message).toBe("Bad request");
             });
         });
-
         test("404 - responds with message 'Bad request' when user doesn't exist", () => {
           const reviewId = 1;
           const comment = {
@@ -1074,7 +1080,6 @@ describe("app", () => {
               );
             });
         });
-
         test("404 - responds with custom not found error message when review doesn't exist", () => {
           const reviewId = 999999999;
           const comment = {
@@ -1093,7 +1098,6 @@ describe("app", () => {
               );
             });
         });
-
         test("400 - responds with message 'Bad request' when review_id is wrong type", () => {
           const reviewId = "okokokok";
           const comment = {
@@ -1110,7 +1114,6 @@ describe("app", () => {
               expect(message).toBe("Bad request");
             });
         });
-
         test("400 - responds with message 'Comment cannot be empty' when body field is empty", () => {
           const reviewId = 1;
           const comment = {
@@ -1138,19 +1141,15 @@ describe("app", () => {
           return request(app)
             .get("/api/users")
             .expect(200)
-            .then(({ body }) => {
-              const { users } = body;
-
+            .then(({ body: { users } }) => {
               users.forEach((user) => {
                 expect(user).toHaveProperty("username", expect.any(String));
                 expect(user).toHaveProperty("name", expect.any(String));
                 expect(user).toHaveProperty("avatar_url", expect.any(String));
               });
-
               expect(users).toHaveLength(4);
             });
         });
-
         test("200 - responds with an empty array of reviews objects if there is no reviews", async () => {
           await emptyUsersTable();
           return request(app)
@@ -1225,7 +1224,6 @@ describe("app", () => {
               );
             });
         });
-
         test("400 - responds with error message 'Bad request' when invalid comment_id passed in", () => {
           const commentId = "first one";
           return request(app)
@@ -1249,8 +1247,8 @@ describe("app", () => {
             .patch(`/api/comments/${commentId}`)
             .send(patchObject)
             .expect(200)
-            .then(({ body: { comment } }) => {
-              expect(comment).toEqual(
+            .then(({ body: { updatedComment } }) => {
+              expect(updatedComment).toEqual(
                 expect.objectContaining({
                   comment_id: commentId,
                   body: expect.any(String),
@@ -1262,7 +1260,6 @@ describe("app", () => {
               );
             });
         });
-
         test("200 - responds with updated comment when decrease votes by passing negative inc_votes as a body object", () => {
           const commentId = 4;
           const patchObject = {
@@ -1272,8 +1269,8 @@ describe("app", () => {
             .patch(`/api/comments/${commentId}`)
             .send(patchObject)
             .expect(200)
-            .then(({ body: { comment } }) => {
-              expect(comment).toEqual(
+            .then(({ body: { updatedComment } }) => {
+              expect(updatedComment).toEqual(
                 expect.objectContaining({
                   comment_id: commentId,
                   body: expect.any(String),
@@ -1286,7 +1283,6 @@ describe("app", () => {
             });
         });
       });
-
       describe("Unsuccessful Responses", () => {
         test("400 - responds with message 'Bad request' when empty body passed in", () => {
           const commentId = 4;
@@ -1310,7 +1306,6 @@ describe("app", () => {
               expect(message).toBe("Bad request");
             });
         });
-
         test("404 - responds with message 'Comment with comment_id '999999' not found' when request is valid but comment doesn't exist", () => {
           const commentId = 999999;
           const patchObject = "";
@@ -1324,7 +1319,6 @@ describe("app", () => {
               );
             });
         });
-
         test("400 - responds with message 'Bad request' when comment_id is wrong type but patch object is valid", () => {
           const commentId = "first";
           const patchObject = {
@@ -1338,7 +1332,6 @@ describe("app", () => {
               expect(message).toBe(`Bad request`);
             });
         });
-
         test("400 - responds with message 'Bad request' when increase by more than 1", () => {
           const commentId = 4;
           const patchObject = {
@@ -1354,7 +1347,6 @@ describe("app", () => {
               );
             });
         });
-
         test("400 - responds with message 'Bad request' when decrease by more than 1", () => {
           const commentId = 4;
           const patchObject = {
@@ -1370,7 +1362,6 @@ describe("app", () => {
               );
             });
         });
-
         test("400 - responds with message 'Bad request' when no object has been send", () => {
           const commentId = 4;
           return request(app)
@@ -1380,7 +1371,6 @@ describe("app", () => {
               expect(message).toBe("Bad request");
             });
         });
-
         test("400 - responds with message 'Bad request' when body object has inc_votes with wrong data type", () => {
           const commentId = 4;
           const patchObject = { inc_votes: "by 2" };
@@ -1411,7 +1401,6 @@ describe("app", () => {
             });
         });
       });
-
       describe("POST", () => {
         test("404 - responds with custom not found error message", () => {
           return request(app)

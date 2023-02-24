@@ -54,9 +54,9 @@ const postReview = async (req, res, next) => {
     if (newReview.owner) {
       await checkIsExistsIn("users", "username", newReview.owner, "Owner");
     }
-    const review = await insertReview(newReview);
+    const insertedReview = await insertReview(newReview);
 
-    res.status(201).send({ review });
+    res.status(201).send({ insertedReview });
   } catch (err) {
     next(err);
   }
@@ -68,9 +68,9 @@ const patchReview = async (req, res, next) => {
 
   try {
     await checkIsExistsIn("reviews", "review_id", review_id, "Review");
-    const review = await updateReview(review_id, patchObject);
+    const updatedReview = await updateReview(review_id, patchObject);
 
-    res.status(200).send({ review });
+    res.status(200).send({ updatedReview });
   } catch (err) {
     next(err);
   }
