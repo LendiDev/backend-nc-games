@@ -1,22 +1,21 @@
 on:
   push:
-    branches:
-      - ci-cd
+    branches: [main, ci-cd]
 jobs:
   runUnitTests:
     name: Unit Tests
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node: [8.1.0, 10, 12, 14, 16, 18]
+        node: [10, 12, 14, 16, 18, 'latest']
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
-      - name: Setup NodeJS
+      - name: Use NodeJS ${{ matrix.node }}
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node }}
-          check-latest: true
+          cache: npm
       - name: Install Dependencies
         run: npm install
       - name: Run Unit Tests
