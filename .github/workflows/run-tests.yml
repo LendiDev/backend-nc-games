@@ -41,7 +41,7 @@ jobs:
       - name: Setup Postgres
         uses: harmon758/postgresql-action@v1
         with:
-          postgresql version: '10'
+          postgresql version: '11'
           postgresql db: 'nc_games_test'
           postgresql user: 'test_user'
           postgresql password: 'secret_password'
