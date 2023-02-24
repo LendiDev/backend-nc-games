@@ -409,56 +409,56 @@ describe("app", () => {
               );
             });
         });
-      });
 
-      test("201 - responds with a newly added review", () => {
-        const newReview = {
-          owner: "mallionaire",
-          title: "Habitats",
-          review_body:
-            "Habitats offers a thinky puzzle to baffle the brain. Optimising the array in front of you is the head-scratcher, as points are fairly limited. It is certainly fun to see your nature park grow, and attempt to meet as many scoring objectives as you can. Habitats falls into the category of games that are easy to learn but tricky to master.",
-          designer: "Habitat",
-          category: "dexterity",
-          review_img_url: "https://i.ibb.co/8sytkzP/dogs-g54858c180-1280.jpg",
-        };
-        return request(app)
-          .post("/api/reviews")
-          .send(newReview)
-          .expect(201)
-          .then(({ body: { review } }) => {
-            expect(review).toEqual(
-              expect.objectContaining({
-                ...expectedReviewShape,
-                ...newReview,
-                review_id: 14,
-              })
-            );
-          });
-      });
-      test("201 - responds with a newly added review without review_img_url, but sets a default instead", () => {
-        const newReview = {
-          owner: "mallionaire",
-          title: "Habitats",
-          review_body:
-            "Habitats offers a thinky puzzle to baffle the brain. Optimising the array in front of you is the head-scratcher, as points are fairly limited. It is certainly fun to see your nature park grow, and attempt to meet as many scoring objectives as you can. Habitats falls into the category of games that are easy to learn but tricky to master.",
-          designer: "Habitat",
-          category: "dexterity",
-        };
-        return request(app)
-          .post("/api/reviews")
-          .send(newReview)
-          .expect(201)
-          .then(({ body: { review } }) => {
-            expect(review).toEqual(
-              expect.objectContaining({
-                ...expectedReviewShape,
-                ...newReview,
-                review_id: 14,
-                review_img_url:
-                  "https://images.pexels.com/photos/163064/play-stone-network-networked-interactive-163064.jpeg?w=700&h=700",
-              })
-            );
-          });
+        test("201 - responds with a newly added review", () => {
+          const newReview = {
+            owner: "mallionaire",
+            title: "Habitats",
+            review_body:
+              "Habitats offers a thinky puzzle to baffle the brain. Optimising the array in front of you is the head-scratcher, as points are fairly limited. It is certainly fun to see your nature park grow, and attempt to meet as many scoring objectives as you can. Habitats falls into the category of games that are easy to learn but tricky to master.",
+            designer: "Habitat",
+            category: "dexterity",
+            review_img_url: "https://i.ibb.co/8sytkzP/dogs-g54858c180-1280.jpg",
+          };
+          return request(app)
+            .post("/api/reviews")
+            .send(newReview)
+            .expect(201)
+            .then(({ body: { review } }) => {
+              expect(review).toEqual(
+                expect.objectContaining({
+                  ...expectedReviewShape,
+                  ...newReview,
+                  review_id: 14,
+                })
+              );
+            });
+        });
+        test("201 - responds with a newly added review without review_img_url, but sets a default instead", () => {
+          const newReview = {
+            owner: "mallionaire",
+            title: "Habitats",
+            review_body:
+              "Habitats offers a thinky puzzle to baffle the brain. Optimising the array in front of you is the head-scratcher, as points are fairly limited. It is certainly fun to see your nature park grow, and attempt to meet as many scoring objectives as you can. Habitats falls into the category of games that are easy to learn but tricky to master.",
+            designer: "Habitat",
+            category: "dexterity",
+          };
+          return request(app)
+            .post("/api/reviews")
+            .send(newReview)
+            .expect(201)
+            .then(({ body: { review } }) => {
+              expect(review).toEqual(
+                expect.objectContaining({
+                  ...expectedReviewShape,
+                  ...newReview,
+                  review_id: 14,
+                  review_img_url:
+                    "https://images.pexels.com/photos/163064/play-stone-network-networked-interactive-163064.jpeg?w=700&h=700",
+                })
+              );
+            });
+        });
       });
       describe("Unsuccessful Responses", () => {
         test("400 - responds with bad request error message when wrong object type passed in", () => {
@@ -1283,31 +1283,33 @@ describe("app", () => {
   });
 
   describe("/api/non-existent-endpoint", () => {
-    describe("GET", () => {
-      test("404 - responds with custom not found error message", () => {
-        return request(app)
-          .get("/api/non-existent-endpoint")
-          .expect(404)
-          .then(({ body }) => {
-            expect(body).toHaveProperty(
-              "message",
-              "GET /api/non-existent-endpoint not found"
-            );
-          });
+    describe("Unsuccessful Responses", () => {
+      describe("GET", () => {
+        test("404 - responds with custom not found error message", () => {
+          return request(app)
+            .get("/api/non-existent-endpoint")
+            .expect(404)
+            .then(({ body }) => {
+              expect(body).toHaveProperty(
+                "message",
+                "GET /api/non-existent-endpoint not found"
+              );
+            });
+        });
       });
-    });
 
-    describe("POST", () => {
-      test("404 - responds with custom not found error message", () => {
-        return request(app)
-          .post("/api/post_it")
-          .expect(404)
-          .then(({ body }) => {
-            expect(body).toHaveProperty(
-              "message",
-              "POST /api/post_it not found"
-            );
-          });
+      describe("POST", () => {
+        test("404 - responds with custom not found error message", () => {
+          return request(app)
+            .post("/api/post_it")
+            .expect(404)
+            .then(({ body }) => {
+              expect(body).toHaveProperty(
+                "message",
+                "POST /api/post_it not found"
+              );
+            });
+        });
       });
     });
   });
