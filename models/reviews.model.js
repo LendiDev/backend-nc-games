@@ -1,10 +1,13 @@
 const db = require("../db/connection");
 const CustomError = require("../utils/custom-error");
+const pagination = require("../utils/pagination");
 
 const selectReviews = async (
   category,
   sort_by = "created_at",
-  order = "DESC"
+  order = "DESC",
+  page,
+  limit
 ) => {
   const sortByWhitelist = [
     "owner",
@@ -23,34 +26,59 @@ const selectReviews = async (
       "Wrong query parameter of 'order'. ASC or DESC are only permitted"
     );
   }
-
   if (!sortByWhitelist.includes(sort_by.toLowerCase())) {
     throw new CustomError(400, `Reviews cannot be sorted by '${sort_by}'`);
+  }
+  if ((page && isNaN(page)) || page < 0) {
+    throw new CustomError(
+      400,
+      `Query value of 'p' should be a positive number`
+    );
+  }
+  if ((limit && isNaN(limit)) || limit < 0) {
+    throw new CustomError(
+      400,
+      `Query value of 'limit' should be a positive number`
+    );
   }
 
   const queryValues = [];
   let whereQueryString = "";
   if (category) {
-    whereQueryString += "WHERE review.category = $1";
+    whereQueryString += "WHERE reviews.category = $1";
     queryValues.push(category);
   }
 
-  const { rows: reviews } = await db.query(
+  const { offset, limit: limit_rows } = pagination(page, limit);
+
+  const {
+    rows: [{ reviews, total_count }],
+  } = await db.query(
     `
-      SELECT 
-          review.*, CAST(COUNT(comments.review_id) as INT) as comment_count 
-      FROM 
-          reviews review
-      LEFT JOIN comments USING (review_id)
-      ${whereQueryString}
-      GROUP BY 
-          review.review_id
-      ORDER BY ${sort_by} ${order};
+      SELECT (SELECT CAST(COUNT(*) AS INT) FROM reviews ${whereQueryString}) as total_count, (SELECT json_agg(reviews.*) AS reviews FROM (
+        SELECT 
+                reviews.*, CAST(COUNT(comments.review_id) as INT) as comment_count 
+            FROM 
+                reviews
+            LEFT JOIN comments ON comments.review_id = reviews.review_id
+            ${whereQueryString}
+            GROUP BY 
+                reviews.review_id
+            ORDER BY ${sort_by} ${order}
+            OFFSET ${offset}
+            LIMIT ${limit_rows}
+      ) AS reviews);
   `,
     queryValues
   );
 
-  return reviews;
+  const max_page = Math.ceil(total_count / limit_rows);
+
+  if (page > max_page) {
+    throw new CustomError(400, `Page is out of range`);
+  }
+
+  return { total_count, reviews: reviews ? reviews : [], max_page };
 };
 
 const selectReviewById = async (review_id) => {
@@ -82,13 +110,19 @@ const insertReview = async (newReview) => {
       : "https://images.pexels.com/photos/163064/play-stone-network-networked-interactive-163064.jpeg?w=700&h=700";
 
   if (review_body && review_body.length < 20) {
-    throw new CustomError(400, 'Review body should be at least 20 characters long')
+    throw new CustomError(
+      400,
+      "Review body should be at least 20 characters long"
+    );
   }
   if (title && title.length < 3) {
-    throw new CustomError(400, 'Review title should be at least 3 characters long')
+    throw new CustomError(
+      400,
+      "Review title should be at least 3 characters long"
+    );
   }
   if (designer && designer.length < 2) {
-    throw new CustomError(400, 'Designer should be at least 2 characters long')
+    throw new CustomError(400, "Designer should be at least 2 characters long");
   }
 
   const {
