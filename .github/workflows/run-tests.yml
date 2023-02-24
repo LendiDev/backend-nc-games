@@ -18,6 +18,7 @@ jobs:
     name: Unit Tests
     needs: useNode
     runs-on: ubuntu-latest
+    steps:
       - name: Check out repository
         uses: actions/checkout@v3
       - name: Install Dependencies
