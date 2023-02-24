@@ -2,20 +2,24 @@ on:
   push:
     branches: [main, ci-cd]
 jobs:
-  runUnitTests:
-    name: Unit Tests
+  useNode: 
+    name: Use NodeJS ${{ matrix.node }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
         node: [10, 12, 14, 16, 18, 'latest']
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v3
       - name: Use NodeJS ${{ matrix.node }}
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node }}
           cache: npm
+  runUnitTests:
+    name: Unit Tests
+    needs: useNode
+    runs-on: ubuntu-latest
+      - name: Check out repository
+        uses: actions/checkout@v3
       - name: Install Dependencies
         run: npm install
       - name: Run Unit Tests
