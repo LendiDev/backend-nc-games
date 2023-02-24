@@ -489,9 +489,7 @@ describe("app", () => {
             )
             .expect(400)
             .then(({ body: { message } }) => {
-              expect(message).toBe(
-                `Page is out of range`
-              );
+              expect(message).toBe(`Page is out of range`);
             });
         });
       });
@@ -513,8 +511,8 @@ describe("app", () => {
             .post("/api/reviews")
             .send(newReview)
             .expect(201)
-            .then(({ body: { review } }) => {
-              expect(review).toEqual(
+            .then(({ body: { insertedReview } }) => {
+              expect(insertedReview).toEqual(
                 expect.objectContaining({
                   ...expectedReviewShape,
                   ...newReview,
@@ -538,8 +536,8 @@ describe("app", () => {
             .post("/api/reviews")
             .send(newReview)
             .expect(201)
-            .then(({ body: { review } }) => {
-              expect(review).toEqual(
+            .then(({ body: { insertedReview } }) => {
+              expect(insertedReview).toEqual(
                 expect.objectContaining({
                   ...expectedReviewShape,
                   ...newReview,
@@ -561,8 +559,8 @@ describe("app", () => {
             .post("/api/reviews")
             .send(newReview)
             .expect(201)
-            .then(({ body: { review } }) => {
-              expect(review).toEqual(
+            .then(({ body: { insertedReview } }) => {
+              expect(insertedReview).toEqual(
                 expect.objectContaining({
                   ...expectedReviewShape,
                   ...newReview,
@@ -751,7 +749,9 @@ describe("app", () => {
             .then(({ body }) => {
               const { message } = body;
 
-              expect(message).toBe(`Review with review_id '${reviewId}' not found`);
+              expect(message).toBe(
+                `Review with review_id '${reviewId}' not found`
+              );
             });
         });
       });
@@ -768,10 +768,8 @@ describe("app", () => {
             .patch(`/api/reviews/${reviewId}`)
             .send(patchObject)
             .expect(200)
-            .then(({ body }) => {
-              const { review } = body;
-
-              expect(review).toEqual(
+            .then(({ body: { updatedReview } }) => {
+              expect(updatedReview).toEqual(
                 expect.objectContaining({
                   review_id: reviewId,
                   title: expect.any(String),
@@ -796,10 +794,8 @@ describe("app", () => {
             .patch(`/api/reviews/${reviewId}`)
             .send(patchObject)
             .expect(200)
-            .then(({ body }) => {
-              const { review } = body;
-
-              expect(review).toEqual(
+            .then(({ body: { updatedReview } }) => {
+              expect(updatedReview).toEqual(
                 expect.objectContaining({
                   review_id: reviewId,
                   title: expect.any(String),
@@ -985,10 +981,8 @@ describe("app", () => {
             .post(`/api/reviews/${reviewId}/comments`)
             .send(commentToPost)
             .expect(201)
-            .then(({ body }) => {
-              const { comment } = body;
-
-              expect(comment).toMatchObject({
+            .then(({ body: { insertedComment } }) => {
+              expect(insertedComment).toMatchObject({
                 comment_id: 7,
                 votes: 0,
                 created_at: expect.any(String),
@@ -1249,8 +1243,8 @@ describe("app", () => {
             .patch(`/api/comments/${commentId}`)
             .send(patchObject)
             .expect(200)
-            .then(({ body: { comment } }) => {
-              expect(comment).toEqual(
+            .then(({ body: { updatedComment } }) => {
+              expect(updatedComment).toEqual(
                 expect.objectContaining({
                   comment_id: commentId,
                   body: expect.any(String),
@@ -1272,8 +1266,8 @@ describe("app", () => {
             .patch(`/api/comments/${commentId}`)
             .send(patchObject)
             .expect(200)
-            .then(({ body: { comment } }) => {
-              expect(comment).toEqual(
+            .then(({ body: { updatedComment } }) => {
+              expect(updatedComment).toEqual(
                 expect.objectContaining({
                   comment_id: commentId,
                   body: expect.any(String),

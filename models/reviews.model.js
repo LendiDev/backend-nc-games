@@ -144,7 +144,7 @@ const updateReview = async (review_id, patchObject) => {
   const { inc_votes } = patchObject;
 
   const {
-    rows: [review],
+    rows: [updatedReview],
   } = await db.query(
     `
       UPDATE reviews 
@@ -154,7 +154,7 @@ const updateReview = async (review_id, patchObject) => {
     [review_id, inc_votes]
   );
 
-  return review;
+  return updatedReview;
 };
 
 module.exports = {
