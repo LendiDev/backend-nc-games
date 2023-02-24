@@ -1,10 +1,17 @@
-const { selectCategoryBySlug } = require("../models/categories.model");
-const { selectReviews, selectReviewById, updateReview } = require("../models/reviews.model");
+const {
+  selectReviews,
+  selectReviewById,
+  updateReview,
+} = require("../models/reviews.model");
+const checkIsExistsIn = require("../utils/db/check-is-exists-in-db");
 
 const getReviews = async (req, res, next) => {
   const { category: category_slug, sort_by, order } = req.query;
+
   try {
-    if (category_slug) await selectCategoryBySlug(category_slug);
+    if (category_slug) {
+      await checkIsExistsIn("categories", "slug", category_slug, "Category");
+    }
     const reviews = await selectReviews(category_slug, sort_by, order);
 
     res.status(200).send({ reviews });
@@ -30,7 +37,7 @@ const patchReview = async (req, res, next) => {
   const patchObject = req.body;
 
   try {
-    await selectReviewById(review_id);
+    await checkIsExistsIn("reviews", "review_id", review_id, "Review");
     const review = await updateReview(review_id, patchObject);
 
     res.status(200).send({ review });
