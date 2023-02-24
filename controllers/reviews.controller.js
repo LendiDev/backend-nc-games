@@ -50,7 +50,7 @@ const postReview = async (req, res, next) => {
     }
     const review = await insertReview(newReview);
 
-    res.status(200).send({ review });
+    res.status(201).send({ review });
   } catch (err) {
     next(err);
   }
