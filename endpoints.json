@@ -66,25 +66,6 @@
       ]
     }
   },
-  "GET /api/reviews/:review_id": {
-    "description": "serves a review defined by review id",
-    "queries": [],
-    "onSuccessStatusCode": 200,
-    "examplePayload": {
-      "review": {
-        "review_id": 8,
-        "title": "Scythe; you're gonna need a bigger table!",
-        "category": "engine-building",
-        "designer": "Jamey Stegmaier",
-        "owner": "grumpy19",
-        "review_body": "Spend 30 minutes just setting up all of the boards ...",
-        "review_img_url": "https://images.pexels.com/photos/4200740/pexels-photo-4200740.jpeg?w=700&h=700",
-        "created_at": "2021-01-22T10:37:04.839Z",
-        "votes": 100,
-        "comment_count": 1
-      }
-    }
-  },
   "POST /api/reviews": {
     "description": "adds a new review",
     "queries": [],
@@ -117,6 +98,25 @@
           "votes": 0,
           "comment_count": 0
         }
+      }
+    }
+  },
+  "GET /api/reviews/:review_id": {
+    "description": "serves a review defined by review id",
+    "queries": [],
+    "onSuccessStatusCode": 200,
+    "examplePayload": {
+      "review": {
+        "review_id": 8,
+        "title": "Scythe; you're gonna need a bigger table!",
+        "category": "engine-building",
+        "designer": "Jamey Stegmaier",
+        "owner": "grumpy19",
+        "review_body": "Spend 30 minutes just setting up all of the boards ...",
+        "review_img_url": "https://images.pexels.com/photos/4200740/pexels-photo-4200740.jpeg?w=700&h=700",
+        "created_at": "2021-01-22T10:37:04.839Z",
+        "votes": 100,
+        "comment_count": 1
       }
     }
   },
