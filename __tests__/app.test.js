@@ -292,6 +292,7 @@ describe("app", () => {
                   expect(reviews.length).toBeGreaterThan(0);
                   expect(reviews).toBeSortedBy(sortBy, {
                     descending: order === "DESC" && true,
+                    coerce: true
                   });
                 });
             });
