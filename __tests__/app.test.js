@@ -4,12 +4,12 @@ const db = require("../db/connection");
 const seed = require("../db/seeds/seed");
 const testData = require("../db/data/test-data");
 
-const emptyReviewsTable = () => {
-  db.query("TRUNCATE reviews RESTART IDENTITY CASCADE;");
+const emptyReviewsTable = async () => {
+  await db.query("TRUNCATE reviews RESTART IDENTITY CASCADE;");
 };
 
-const emptyUsersTable = () => {
-  db.query("TRUNCATE users RESTART IDENTITY CASCADE;");
+const emptyUsersTable = async () => {
+  await db.query("TRUNCATE users RESTART IDENTITY CASCADE;");
 };
 
 beforeEach(() => {
@@ -833,8 +833,8 @@ describe("app", () => {
             });
         });
 
-        test("200 - responds with an empty array of reviews objects if there is no reviews", () => {
-          emptyUsersTable();
+        test("200 - responds with an empty array of reviews objects if there is no reviews", async () => {
+          await emptyUsersTable();
           return request(app)
             .get("/api/users")
             .expect(200)
