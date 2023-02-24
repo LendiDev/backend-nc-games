@@ -20,4 +20,5 @@ jobs:
       - name: Install Dependencies
         run: npm install
       - name: Run Unit Tests
-        run: npm t
+        run: npm t utils
+        run: npm t custom-error
