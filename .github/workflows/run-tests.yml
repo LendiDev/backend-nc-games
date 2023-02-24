@@ -18,6 +18,6 @@ jobs:
           node-version: ${{ matrix.node }}
           check-latest: true
       - name: Install Dependencies
-        run: npm ci
+        run: npm install
       - name: Run Unit Tests
         run: npm t
