@@ -27,7 +27,7 @@
   },
   "GET /api/reviews": {
     "description": "serves an array of all reviews",
-    "queries": ["category", "sort_by", "order"],
+    "queries": ["category", "sort_by", "order", "p", "limit"],
     "queriesLimitation": [
       {
         "sort_by": [
@@ -45,7 +45,9 @@
     "queriesDefaults": [
       {
         "sort_by": "created_at",
-        "order": "DESC"
+        "order": "DESC",
+        "limit": "1",
+        "p": "10"
       }
     ],
     "onSuccessStatusCode": 200,

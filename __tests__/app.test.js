@@ -112,7 +112,7 @@ describe("app", () => {
                 );
               });
 
-              expect(reviews).toHaveLength(13);
+              expect(reviews).toHaveLength(10);
               expect(reviewsCommentsTotalCount).toBe(6);
               expect(reviews).toBeSortedBy("created_at", {
                 descending: true,
@@ -131,6 +131,57 @@ describe("app", () => {
               expect(reviews).toHaveLength(0);
             });
         });
+
+        test("200 - responds with an array of reviews objects if page is 2 and limit 10", async () => {
+          return request(app)
+            .get("/api/reviews?p=2&limit=10")
+            .expect(200)
+            .then(({ body: { max_page, total_count, reviews } }) => {
+              reviews.forEach((review) => {
+                expect(review).toEqual(
+                  expect.objectContaining(expectedReviewShape)
+                );
+              });
+              expect(total_count).toBe(13);
+              expect(reviews).toHaveLength(3);
+              expect(max_page).toBe(2);
+            });
+        });
+
+        test("200 - responds with an array of reviews objects if limit is set to only 10", async () => {
+          return request(app)
+            .get("/api/reviews?limit=10")
+            .expect(200)
+            .then(({ body: { total_count, reviews } }) => {
+              reviews.forEach((review) => {
+                expect(review).toEqual(
+                  expect.objectContaining(expectedReviewShape)
+                );
+              });
+              expect(total_count).toBe(13);
+              expect(reviews).toHaveLength(10);
+            });
+        });
+        test("200 - responds with an filtered array by category of reviews objects and in ASC order by title if limit is set to 5 and page is 1", async () => {
+          return request(app)
+            .get(
+              "/api/reviews?category=social deduction&sort_by=title&order=ASC&p=1&limit=5"
+            )
+            .expect(200)
+            .then(({ body: { total_count, reviews } }) => {
+              reviews.forEach((review) => {
+                expect(review).toEqual(
+                  expect.objectContaining({
+                    ...expectedReviewShape,
+                    category: "social deduction",
+                  })
+                );
+              });
+              expect(reviews).toBeSortedBy("title", { coerce: true });
+              expect(total_count).toBe(11);
+              expect(reviews).toHaveLength(5);
+            });
+        });
       });
     });
 
@@ -146,7 +197,7 @@ describe("app", () => {
     const reviewsOrderWhitelist = ["ASC", "DESC"];
     const reviewsCategories = [
       { slug: "euro game", expectedLength: 1 },
-      { slug: "social deduction", expectedLength: 11 },
+      { slug: "social deduction", expectedLength: 10 },
     ];
 
     describe("GET ?category=...", () => {
@@ -215,7 +266,7 @@ describe("app", () => {
                 );
               });
 
-              expect(reviews).toHaveLength(11);
+              expect(reviews).toHaveLength(10);
               expect(reviews).toBeSortedBy("created_at");
             });
         });
@@ -378,6 +429,69 @@ describe("app", () => {
             .expect(404)
             .then(({ body: { message } }) => {
               expect(message).toBe(`Category with slug 'superset' not found`);
+            });
+        });
+        test("400 - responds with custom error message when query is valid but a value of p (page) not a number", () => {
+          return request(app)
+            .get(
+              `/api/reviews?category=dexterity&sort_by=owner&order=ASC&p=last`
+            )
+            .expect(400)
+            .then(({ body: { message } }) => {
+              expect(message).toBe(
+                `Query value of 'p' should be a positive number`
+              );
+            });
+        });
+        test("400 - responds with custom error message when query is valid but a value of limit not a number", () => {
+          return request(app)
+            .get(
+              `/api/reviews?category=dexterity&sort_by=owner&order=ASC&p=1&limit='ten'`
+            )
+            .expect(400)
+            .then(({ body: { message } }) => {
+              expect(message).toBe(
+                `Query value of 'limit' should be a positive number`
+              );
+            });
+        });
+
+        test("400 - responds with custom error message when query is valid but a value of limit is negative", () => {
+          return request(app)
+            .get(
+              `/api/reviews?category=dexterity&sort_by=owner&order=ASC&p=1&limit=-10`
+            )
+            .expect(400)
+            .then(({ body: { message } }) => {
+              expect(message).toBe(
+                `Query value of 'limit' should be a positive number`
+              );
+            });
+        });
+
+        test("400 - responds with custom error message when query is valid but a value of p is negative", () => {
+          return request(app)
+            .get(
+              `/api/reviews?category=dexterity&sort_by=owner&order=ASC&p=-100&limit=10`
+            )
+            .expect(400)
+            .then(({ body: { message } }) => {
+              expect(message).toBe(
+                `Query value of 'p' should be a positive number`
+              );
+            });
+        });
+
+        test("400 - responds with custom error message when p is out of range", () => {
+          return request(app)
+            .get(
+              `/api/reviews?category=dexterity&sort_by=owner&order=ASC&p=100&limit=10`
+            )
+            .expect(400)
+            .then(({ body: { message } }) => {
+              expect(message).toBe(
+                `Page is out of range`
+              );
             });
         });
       });

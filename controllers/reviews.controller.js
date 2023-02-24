@@ -7,15 +7,21 @@ const {
 const checkIsExistsIn = require("../utils/db/check-is-exists-in-db");
 
 const getReviews = async (req, res, next) => {
-  const { category: category_slug, sort_by, order } = req.query;
+  const { category: category_slug, sort_by, order, p, limit } = req.query;
 
   try {
     if (category_slug) {
       await checkIsExistsIn("categories", "slug", category_slug, "Category");
     }
-    const reviews = await selectReviews(category_slug, sort_by, order);
+    const reviews = await selectReviews(
+      category_slug,
+      sort_by,
+      order,
+      p,
+      limit
+    );
 
-    res.status(200).send({ reviews });
+    res.status(200).send(reviews);
   } catch (err) {
     next(err);
   }
