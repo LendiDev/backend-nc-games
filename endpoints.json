@@ -90,7 +90,7 @@
         "review_img_url": "https://i.ibb.co/8sytkzP/dogs-g54858c180-1280.jpg"
       },
       "examplePayload": {
-        "review": {
+        "insertedReview": {
           "review_id": 26,
           "title": "Habitats",
           "category": "dexterity",
@@ -134,7 +134,7 @@
           "inc_votes": 1
         },
         "examplePayload": {
-          "review": {
+          "updatedReview": {
             "review_id": 8,
             "title": "Scythe; you're gonna need a bigger table!",
             "category": "engine-building",
@@ -152,7 +152,7 @@
           "inc_votes": -2
         },
         "examplePayload": {
-          "review": {
+          "updatedReview": {
             "review_id": 8,
             "title": "Scythe; you're gonna need a bigger table!",
             "category": "engine-building",
@@ -194,7 +194,7 @@
         "body": "Amazing board game!"
       },
       "examplePayload": {
-        "comment": {
+        "insertedComment": {
           "comment_id": 63,
           "body": "Amazing board game!",
           "review_id": 2,
@@ -221,7 +221,7 @@
           "inc_votes": 1
         },
         "examplePayload": {
-          "comment": {
+          "updatedComment": {
             "comment_id": 2,
             "body": "My dog loved this game too!",
             "review_id": 4,
@@ -237,7 +237,7 @@
         },
         "examplePayload": {
           "review": {
-            "comment": {
+            "updatedComment": {
               "comment_id": 2,
               "body": "My dog loved this game too!",
               "review_id": 4,
