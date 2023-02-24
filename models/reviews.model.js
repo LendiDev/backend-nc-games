@@ -35,7 +35,7 @@ const selectReviews = async (
     queryValues.push(category);
   }
 
-  const { rows: reviews, rowCount } = await db.query(
+  const { rows: reviews } = await db.query(
     `
       SELECT 
           review.*, CAST(COUNT(comments.review_id) as INT) as comment_count 
@@ -54,7 +54,10 @@ const selectReviews = async (
 };
 
 const selectReviewById = async (review_id) => {
-  const { rows, rowCount } = await db.query(
+  const {
+    rows: [review],
+    rowCount,
+  } = await db.query(
     `
       SELECT reviews.*, CAST(COUNT(comments.review_id) as INT) as comment_count FROM reviews
       LEFT JOIN comments USING (review_id)
@@ -63,15 +66,18 @@ const selectReviewById = async (review_id) => {
     [review_id]
   );
 
-  if (rowCount === 0) throw new CustomError(404, "Review not found");
+  if (rowCount === 0)
+    throw new CustomError(404, `Review with review_id '${review_id}' found`);
 
-  return rows[0];
+  return review;
 };
 
 const updateReview = async (review_id, patchObject) => {
   const { inc_votes } = patchObject;
 
-  const { rows } = await db.query(
+  const {
+    rows: [review],
+  } = await db.query(
     `
       UPDATE reviews 
       SET votes = votes + $2
@@ -80,7 +86,7 @@ const updateReview = async (review_id, patchObject) => {
     [review_id, inc_votes]
   );
 
-  return rows[0];
+  return review;
 };
 
 module.exports = { selectReviews, selectReviewById, updateReview };
