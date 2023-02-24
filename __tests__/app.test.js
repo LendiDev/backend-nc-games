@@ -184,7 +184,9 @@ describe("app", () => {
             .get("/api/reviews?category=non existent category")
             .expect(404)
             .then(({ body: { message } }) => {
-              expect(message).toBe("Category not found");
+              expect(message).toBe(
+                `Category with slug 'non existent category' not found`
+              );
             });
         });
       });
@@ -238,7 +240,7 @@ describe("app", () => {
         });
       });
       describe("Unsuccessful Responses", () => {
-        test("400 - response with custom message 'Reviews cannot be sorted by '...'' when not permitted sort_by query value requested", () => {
+        test("400 - responds with custom error message 'Reviews cannot be sorted by '...'' when not permitted sort_by query value requested", () => {
           return request(app)
             .get(`/api/reviews?sort_by=author`)
             .expect(400)
@@ -265,7 +267,7 @@ describe("app", () => {
         });
       });
       describe("Unsuccessful Responses", () => {
-        test("400 - response with custom message 'Wrong query parameter of 'order'. ASC or DESC are only permitted' when not permitted order query value requested", () => {
+        test("400 - responds with custom error message 'Wrong query parameter of 'order'. ASC or DESC are only permitted' when not permitted order query value requested", () => {
           return request(app)
             .get(`/api/reviews?order=descending`)
             .expect(400)
@@ -297,7 +299,7 @@ describe("app", () => {
         });
       });
       describe("Successful Responses", () => {
-        test("400 - response with custom message 'Reviews cannot be sorted by '...'' when not permitted order query value requested and category not specified", () => {
+        test("400 - responds with custom error message 'Reviews cannot be sorted by '...'' when not permitted order query value requested and category not specified", () => {
           return request(app)
             .get(`/api/reviews?sort_by=author&order=ASC`)
             .expect(400)
@@ -341,7 +343,7 @@ describe("app", () => {
         });
       });
       describe("Unsuccessful Responses", () => {
-        test("400 - response with custom message 'Wrong query parameter of 'order'. ASC or DESC are only permitted' when not permitted order query value requested and category is valid", () => {
+        test("400 - responds with custom error message 'Wrong query parameter of 'order'. ASC or DESC are only permitted' when not permitted order query value requested and category is valid", () => {
           return request(app)
             .get(`/api/reviews?category=dexterity&order=ASCC`)
             .expect(400)
@@ -351,7 +353,7 @@ describe("app", () => {
               );
             });
         });
-        test("400 - response with custom message 'Reviews cannot be sorted by '...'' when not permitted order query value requested and category does exist, and valid order query value requested", () => {
+        test("400 - responds with custom error message 'Reviews cannot be sorted by '...'' when not permitted order query value requested and category does exist, and valid order query value requested", () => {
           return request(app)
             .get(`/api/reviews?category=dexterity&sort_by=author&order=ASC`)
             .expect(400)
@@ -359,12 +361,12 @@ describe("app", () => {
               expect(message).toBe("Reviews cannot be sorted by 'author'");
             });
         });
-        test("404 - response with error message 'Category not found' when not permitted order query value requested and category does not exist, and valid order query value requested", () => {
+        test("404 - responds with error message 'Category not found' when not permitted order query value requested and category does not exist, and valid order query value requested", () => {
           return request(app)
             .get(`/api/reviews?category=superset&sort_by=author&order=ASC`)
             .expect(404)
             .then(({ body: { message } }) => {
-              expect(message).toBe("Category not found");
+              expect(message).toBe(`Category with slug 'superset' not found`);
             });
         });
       });
@@ -415,7 +417,7 @@ describe("app", () => {
       });
 
       describe("Unsuccessful Responses", () => {
-        test("400 - response with message 'Bad request' when wrong type passed in as review_id", () => {
+        test("400 - responds with message 'Bad request' when wrong type passed in as review_id", () => {
           const reviewId = "something-illegal";
           return request(app)
             .get(`/api/reviews/${reviewId}`)
@@ -426,7 +428,7 @@ describe("app", () => {
               expect(message).toBe("Bad request");
             });
         });
-        test("404 - response with message 'Review not found' when review_id doesn't exist", () => {
+        test("404 - responds with message 'Review not found' when review_id doesn't exist", () => {
           const reviewId = 9999999;
           return request(app)
             .get(`/api/reviews/${reviewId}`)
@@ -434,7 +436,7 @@ describe("app", () => {
             .then(({ body }) => {
               const { message } = body;
 
-              expect(message).toBe("Review not found");
+              expect(message).toBe(`Review with review_id '${reviewId}' found`);
             });
         });
       });
@@ -500,7 +502,7 @@ describe("app", () => {
       });
 
       describe("Unsuccessful Responses", () => {
-        test("400 - response with message 'Bad request' when empty body passed in", () => {
+        test("400 - responds with message 'Bad request' when empty body passed in", () => {
           const reviewId = 2;
           const patchObject = "";
           return request(app)
@@ -513,7 +515,7 @@ describe("app", () => {
               expect(message).toBe("Bad request");
             });
         });
-        test("400 - response with message 'Bad request' when empty body object passed in", () => {
+        test("400 - responds with message 'Bad request' when empty body object passed in", () => {
           const reviewId = 2;
           const patchObject = {};
           return request(app)
@@ -527,7 +529,7 @@ describe("app", () => {
             });
         });
 
-        test("404 - response with message 'Review not found' when request is valid but review doesn't exist", () => {
+        test("404 - responds with custom not found error message when request is valid but review doesn't exist", () => {
           const reviewId = 9999999;
           const patchObject = "";
           return request(app)
@@ -537,11 +539,13 @@ describe("app", () => {
             .then(({ body }) => {
               const { message } = body;
 
-              expect(message).toBe("Review not found");
+              expect(message).toBe(
+                `Review with review_id '${reviewId}' not found`
+              );
             });
         });
 
-        test("400 - response with message 'Bad request' when review_id is wrong type but patch object is valid", () => {
+        test("400 - responds with message 'Bad request' when review_id is wrong type but patch object is valid", () => {
           const reviewId = "twentyTwo";
           const patchObject = {
             inc_votes: 5,
@@ -557,7 +561,7 @@ describe("app", () => {
             });
         });
 
-        test("400 - response with message 'Bad request' when no object has been send", () => {
+        test("400 - responds with message 'Bad request' when no object has been send", () => {
           const reviewId = 2;
           return request(app)
             .patch(`/api/reviews/${reviewId}`)
@@ -569,7 +573,7 @@ describe("app", () => {
             });
         });
 
-        test("400 - response with message 'Bad request' when body object has inc_votes with wrong data type", () => {
+        test("400 - responds with message 'Bad request' when body object has inc_votes with wrong data type", () => {
           const reviewId = 2;
           const patchObject = { inc_votes: "plus2" };
           return request(app)
@@ -643,7 +647,9 @@ describe("app", () => {
             .expect(404)
             .then(({ body }) => {
               const { message } = body;
-              expect(message).toBe("Review not found");
+              expect(message).toBe(
+                `Review with review_id '${reviewId}' not found`
+              );
             });
         });
       });
@@ -751,7 +757,7 @@ describe("app", () => {
             });
         });
 
-        test("400 - responds with message 'Bad request' when review doesn't exist", () => {
+        test("404 - responds with custom not found error message when review doesn't exist", () => {
           const reviewId = 999999999;
           const comment = {
             username: "mallionaire",
@@ -760,11 +766,13 @@ describe("app", () => {
           return request(app)
             .post(`/api/reviews/${reviewId}/comments`)
             .send(comment)
-            .expect(400)
+            .expect(404)
             .then(({ body }) => {
               const { message } = body;
 
-              expect(message).toBe("Bad request");
+              expect(message).toBe(
+                `Review with review_id '${reviewId}' not found`
+              );
             });
         });
 
@@ -862,7 +870,7 @@ describe("app", () => {
       });
 
       describe("Unsuccessful Responses", () => {
-        test("404 - response with message 'User with username '...' not found' when username doesn't exist", () => {
+        test("404 - responds with message 'User with username '...' not found' when username doesn't exist", () => {
           const username = "lol";
           return request(app)
             .get(`/api/users/${username}`)
@@ -894,7 +902,9 @@ describe("app", () => {
             .delete(`/api/comments/${commentId}`)
             .expect(404)
             .then(({ body: { message } }) => {
-              expect(message).toBe(`Comment with id '${commentId}' not found`);
+              expect(message).toBe(
+                `Comment with comment_id '${commentId}' not found`
+              );
             });
         });
 
@@ -921,7 +931,7 @@ describe("app", () => {
             .patch(`/api/comments/${commentId}`)
             .send(patchObject)
             .expect(200)
-            .then(({ body: {comment} }) => {
+            .then(({ body: { comment } }) => {
               expect(comment).toEqual(
                 expect.objectContaining({
                   comment_id: commentId,
@@ -944,7 +954,7 @@ describe("app", () => {
             .patch(`/api/comments/${commentId}`)
             .send(patchObject)
             .expect(200)
-            .then(({ body: {comment} }) => {
+            .then(({ body: { comment } }) => {
               expect(comment).toEqual(
                 expect.objectContaining({
                   comment_id: commentId,
@@ -960,7 +970,7 @@ describe("app", () => {
       });
 
       describe("Unsuccessful Responses", () => {
-        test("400 - response with message 'Bad request' when empty body passed in", () => {
+        test("400 - responds with message 'Bad request' when empty body passed in", () => {
           const commentId = 4;
           const patchObject = "";
           return request(app)
@@ -971,7 +981,7 @@ describe("app", () => {
               expect(message).toBe("Bad request");
             });
         });
-        test("400 - response with message 'Bad request' when empty body object passed in", () => {
+        test("400 - responds with message 'Bad request' when empty body object passed in", () => {
           const commentId = 4;
           const patchObject = {};
           return request(app)
@@ -983,7 +993,7 @@ describe("app", () => {
             });
         });
 
-        test("404 - response with message 'Comment with id '999999' not found' when request is valid but comment doesn't exist", () => {
+        test("404 - responds with message 'Comment with comment_id '999999' not found' when request is valid but comment doesn't exist", () => {
           const commentId = 999999;
           const patchObject = "";
           return request(app)
@@ -991,11 +1001,13 @@ describe("app", () => {
             .send(patchObject)
             .expect(404)
             .then(({ body: { message } }) => {
-              expect(message).toBe(`Comment with id '${commentId}' not found`);
+              expect(message).toBe(
+                `Comment with comment_id '${commentId}' not found`
+              );
             });
         });
 
-        test("400 - response with message 'Bad request' when comment_id is wrong type but patch object is valid", () => {
+        test("400 - responds with message 'Bad request' when comment_id is wrong type but patch object is valid", () => {
           const commentId = "first";
           const patchObject = {
             inc_votes: -1,
@@ -1009,7 +1021,7 @@ describe("app", () => {
             });
         });
 
-        test("400 - response with message 'Bad request' when increase by more than 1", () => {
+        test("400 - responds with message 'Bad request' when increase by more than 1", () => {
           const commentId = 4;
           const patchObject = {
             inc_votes: 5,
@@ -1019,11 +1031,13 @@ describe("app", () => {
             .send(patchObject)
             .expect(400)
             .then(({ body: { message } }) => {
-              expect(message).toBe(`Votes only permitted to be changed by 1 or -1`);
+              expect(message).toBe(
+                `Votes only permitted to be changed by 1 or -1`
+              );
             });
         });
 
-        test("400 - response with message 'Bad request' when decrease by more than 1", () => {
+        test("400 - responds with message 'Bad request' when decrease by more than 1", () => {
           const commentId = 4;
           const patchObject = {
             inc_votes: 5,
@@ -1033,11 +1047,13 @@ describe("app", () => {
             .send(patchObject)
             .expect(400)
             .then(({ body: { message } }) => {
-              expect(message).toBe(`Votes only permitted to be changed by 1 or -1`);
+              expect(message).toBe(
+                `Votes only permitted to be changed by 1 or -1`
+              );
             });
         });
 
-        test("400 - response with message 'Bad request' when no object has been send", () => {
+        test("400 - responds with message 'Bad request' when no object has been send", () => {
           const commentId = 4;
           return request(app)
             .patch(`/api/comments/${commentId}`)
@@ -1047,7 +1063,7 @@ describe("app", () => {
             });
         });
 
-        test("400 - response with message 'Bad request' when body object has inc_votes with wrong data type", () => {
+        test("400 - responds with message 'Bad request' when body object has inc_votes with wrong data type", () => {
           const commentId = 4;
           const patchObject = { inc_votes: "by 2" };
           return request(app)
@@ -1064,7 +1080,7 @@ describe("app", () => {
 
   describe("/api/non-existent-endpoint", () => {
     describe("GET", () => {
-      test("404 - should response with 'Not Found' message", () => {
+      test("404 - responds with custom not found error message", () => {
         return request(app)
           .get("/api/non-existent-endpoint")
           .expect(404)
@@ -1078,7 +1094,7 @@ describe("app", () => {
     });
 
     describe("POST", () => {
-      test("404 - should response with 'Not Found' message", () => {
+      test("404 - responds with custom not found error message", () => {
         return request(app)
           .post("/api/post_it")
           .expect(404)
