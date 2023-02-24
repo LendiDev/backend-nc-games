@@ -23,7 +23,7 @@ const selectReviews = async (
   if (!orderWhitelist.includes(order.toUpperCase())) {
     throw new CustomError(
       400,
-      "Wrong query parameter of 'order'. ASC or DESC are only permitted"
+      "Invalid query value of 'order' parameter. ASC or DESC are only permitted"
     );
   }
   if (!sortByWhitelist.includes(sort_by.toLowerCase())) {
@@ -32,13 +32,13 @@ const selectReviews = async (
   if ((page && isNaN(page)) || page < 0) {
     throw new CustomError(
       400,
-      `Query value of 'p' should be a positive number`
+      `Invalid query value of 'p' parameter. Positive number is only permitted`
     );
   }
   if ((limit && isNaN(limit)) || limit < 0) {
     throw new CustomError(
       400,
-      `Query value of 'limit' should be a positive number`
+      `Invalid query value of 'limit' parameter. Positive number is only permitted`
     );
   }
 
@@ -56,29 +56,29 @@ const selectReviews = async (
   } = await db.query(
     `
       SELECT (SELECT CAST(COUNT(*) AS INT) FROM reviews ${whereQueryString}) as total_count, (SELECT json_agg(reviews.*) AS reviews FROM (
-        SELECT 
-                reviews.*, CAST(COUNT(comments.review_id) as INT) as comment_count 
-            FROM 
-                reviews
-            LEFT JOIN comments ON comments.review_id = reviews.review_id
-            ${whereQueryString}
-            GROUP BY 
-                reviews.review_id
-            ORDER BY ${sort_by} ${order}
-            OFFSET ${offset}
-            LIMIT ${limit_rows}
+          SELECT 
+              reviews.*, CAST(COUNT(comments.review_id) as INT) as comment_count 
+          FROM 
+              reviews
+          LEFT JOIN comments ON comments.review_id = reviews.review_id
+          ${whereQueryString}
+          GROUP BY 
+              reviews.review_id
+          ORDER BY ${sort_by} ${order}
+          OFFSET ${offset}
+          LIMIT ${limit_rows}
       ) AS reviews);
   `,
     queryValues
   );
 
-  const max_page = Math.ceil(total_count / limit_rows);
+  const max_pages = Math.ceil(total_count / limit_rows);
 
-  if (page > max_page) {
+  if (page > max_pages) {
     throw new CustomError(400, `Page is out of range`);
   }
 
-  return { total_count, reviews: reviews ? reviews : [], max_page };
+  return { total_count, max_pages, reviews: reviews ? reviews : [] };
 };
 
 const selectReviewById = async (review_id) => {
@@ -95,7 +95,7 @@ const selectReviewById = async (review_id) => {
   );
 
   if (rowCount === 0)
-    throw new CustomError(404, `Review with review_id '${review_id}' found`);
+    throw new CustomError(404, `Review with review_id '${review_id}' not found`);
 
   return review;
 };
