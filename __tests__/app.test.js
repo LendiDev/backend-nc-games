@@ -336,6 +336,7 @@ describe("app", () => {
                     expect(reviews).toHaveLength(expectedLength);
                     expect(reviews).toBeSortedBy(sortBy, {
                       descending: order === "DESC" && true,
+                      coerce: true,
                     });
                   });
               });
