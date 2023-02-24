@@ -113,7 +113,7 @@ describe("app", () => {
 
               expect(reviews).toHaveLength(13);
               expect(reviewsCommentsTotalCount).toBe(6);
-              expect(reviews).toBeSortedBy("created_at", { descending: true });
+              expect(reviews).toBeSortedBy("created_at", { descending: true, coerce: true, });
             });
         });
 
@@ -165,7 +165,7 @@ describe("app", () => {
               });
               expect(reviews).toHaveLength(1);
               expect(reviewsCommentsTotalCount).toBe(0);
-              expect(reviews).toBeSortedBy("created_at", { descending: true });
+              expect(reviews).toBeSortedBy("created_at", { descending: true, coerce: true, });
             });
         });
 
@@ -234,6 +234,7 @@ describe("app", () => {
                 expect(reviews.length).toBeGreaterThan(0);
                 expect(reviews).toBeSortedBy(sortBy, {
                   descending: true,
+                  coerce: true,
                 });
               });
           });
@@ -261,6 +262,7 @@ describe("app", () => {
                 expect(reviews.length).toBeGreaterThan(0);
                 expect(reviews).toBeSortedBy("created_at", {
                   descending: order === "DESC" && true,
+                  coerce: true,
                 });
               });
           });
@@ -614,7 +616,7 @@ describe("app", () => {
                 });
               });
               expect(comments).toHaveLength(3);
-              expect(comments).toBeSortedBy("created_at", { descending: true });
+              expect(comments).toBeSortedBy("created_at", { descending: true, coerce: true, });
             });
         });
 
