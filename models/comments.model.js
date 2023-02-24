@@ -17,7 +17,7 @@ const insertCommentByReviewId = async (review_id, comment) => {
   const { username: author, body } = comment;
 
   if (body !== undefined && body.length === 0)
-    throw new CustomError(400, "Comment cannot be empty");
+    throw new CustomError(400, "Comment body cannot be empty");
 
   const {
     rows: [insertedComment],

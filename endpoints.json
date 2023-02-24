@@ -46,12 +46,14 @@
       {
         "sort_by": "created_at",
         "order": "DESC",
-        "limit": "1",
-        "p": "10"
+        "p": "1",
+        "limit": "10"
       }
     ],
     "onSuccessStatusCode": 200,
     "examplePayload": {
+      "total_count": 13,
+      "max_pages": 2,
       "reviews": [
         {
           "review_id": 8,

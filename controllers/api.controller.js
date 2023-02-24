@@ -10,4 +10,8 @@ const getEndpoints = async (req, res, next) => {
   }
 };
 
-module.exports = { getEndpoints };
+const redirectToEndpoints = async (req, res) => {
+  res.redirect("/api");
+};
+
+module.exports = { getEndpoints, redirectToEndpoints };
