@@ -284,8 +284,8 @@ describe("app", () => {
       describe("Successful Responses", () => {
         reviewsOrderWhitelist.forEach((order) => {
           reviewsSortByWhitelist.forEach((sortBy) => {
-            test(`200 - responds with an array of all reviews objects and should be sorted by ${sortBy} in ${order} order`, () => {
-              return request(app)
+            test(`200 - responds with an array of all reviews objects and should be sorted by ${sortBy} in ${order} order`, async () => {
+              return await request(app)
                 .get(`/api/reviews?sort_by=${sortBy}&order=${order}`)
                 .expect(200)
                 .then(({ body: { reviews } }) => {
