@@ -4,12 +4,12 @@ const db = require("../db/connection");
 const seed = require("../db/seeds/seed");
 const testData = require("../db/data/test-data");
 
-const emptyReviewsTable = () => {
-  db.query("TRUNCATE reviews RESTART IDENTITY CASCADE;");
+const emptyReviewsTable = async () => {
+  await db.query("TRUNCATE reviews RESTART IDENTITY CASCADE;");
 };
 
-const emptyUsersTable = () => {
-  db.query("TRUNCATE users RESTART IDENTITY CASCADE;");
+const emptyUsersTable = async () => {
+  await db.query("TRUNCATE users RESTART IDENTITY CASCADE;");
 };
 
 beforeEach(() => {
@@ -113,7 +113,7 @@ describe("app", () => {
 
               expect(reviews).toHaveLength(13);
               expect(reviewsCommentsTotalCount).toBe(6);
-              expect(reviews).toBeSortedBy("created_at", { descending: true });
+              expect(reviews).toBeSortedBy("created_at", { descending: true, coerce: true, });
             });
         });
 
@@ -165,7 +165,7 @@ describe("app", () => {
               });
               expect(reviews).toHaveLength(1);
               expect(reviewsCommentsTotalCount).toBe(0);
-              expect(reviews).toBeSortedBy("created_at", { descending: true });
+              expect(reviews).toBeSortedBy("created_at", { descending: true, coerce: true, });
             });
         });
 
@@ -234,6 +234,7 @@ describe("app", () => {
                 expect(reviews.length).toBeGreaterThan(0);
                 expect(reviews).toBeSortedBy(sortBy, {
                   descending: true,
+                  coerce: true,
                 });
               });
           });
@@ -261,6 +262,7 @@ describe("app", () => {
                 expect(reviews.length).toBeGreaterThan(0);
                 expect(reviews).toBeSortedBy("created_at", {
                   descending: order === "DESC" && true,
+                  coerce: true,
                 });
               });
           });
@@ -284,14 +286,15 @@ describe("app", () => {
       describe("Successful Responses", () => {
         reviewsOrderWhitelist.forEach((order) => {
           reviewsSortByWhitelist.forEach((sortBy) => {
-            test(`200 - responds with an array of all reviews objects and should be sorted by ${sortBy} in ${order} order`, () => {
-              return request(app)
+            test(`200 - responds with an array of all reviews objects and should be sorted by ${sortBy} in ${order} order`, async () => {
+              return await request(app)
                 .get(`/api/reviews?sort_by=${sortBy}&order=${order}`)
                 .expect(200)
                 .then(({ body: { reviews } }) => {
                   expect(reviews.length).toBeGreaterThan(0);
                   expect(reviews).toBeSortedBy(sortBy, {
                     descending: order === "DESC" && true,
+                    coerce: true
                   });
                 });
             });
@@ -335,6 +338,7 @@ describe("app", () => {
                     expect(reviews).toHaveLength(expectedLength);
                     expect(reviews).toBeSortedBy(sortBy, {
                       descending: order === "DESC" && true,
+                      coerce: true,
                     });
                   });
               });
@@ -612,7 +616,7 @@ describe("app", () => {
                 });
               });
               expect(comments).toHaveLength(3);
-              expect(comments).toBeSortedBy("created_at", { descending: true });
+              expect(comments).toBeSortedBy("created_at", { descending: true, coerce: true, });
             });
         });
 
@@ -833,8 +837,8 @@ describe("app", () => {
             });
         });
 
-        test("200 - responds with an empty array of reviews objects if there is no reviews", () => {
-          emptyUsersTable();
+        test("200 - responds with an empty array of reviews objects if there is no reviews", async () => {
+          await emptyUsersTable();
           return request(app)
             .get("/api/users")
             .expect(200)
