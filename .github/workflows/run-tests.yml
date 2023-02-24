@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node: [12, 14, 16, 18, "latest"] #, 14, 16, 18, "latest"
+        node: [12, 14, 16, 18, "latest"]
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
@@ -27,7 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node: [12, 14, 16, 18, "latest"] #, 14, 16, 18, "latest"
+        node: [12, 14, 16, 18, "latest"]
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
@@ -42,8 +42,10 @@ jobs:
         uses: harmon758/postgresql-action@v1
         with:
           postgresql version: '10'
-          postgresql db: 'nc_games_test'
+          postgresql db: ${{ secrets.DB_TEST }}
           postgresql user: 'test_user'
           postgresql password: 'secret_password'
       - name: Run E2E tests
-        run: PGDATABASE=nc_games_test PGUSER=test_user PGPASSWORD=secret_password npm t app
+        env:
+          DB_TEST: ${{ secrets.DB_TEST }}
+        run: PGDATABASE=$DB_TEST PGUSER=test_user PGPASSWORD=secret_password npm t app
