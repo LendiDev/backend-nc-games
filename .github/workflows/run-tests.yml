@@ -1,4 +1,4 @@
-name: Run Tests
+name: Unit tests and E2E tests
 on:
   pull_request:
     branches: [main]
