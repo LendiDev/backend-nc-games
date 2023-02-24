@@ -29,13 +29,13 @@ const selectReviews = async (
   if (!sortByWhitelist.includes(sort_by.toLowerCase())) {
     throw new CustomError(400, `Reviews cannot be sorted by '${sort_by}'`);
   }
-  if ((page && isNaN(page)) || page < 0) {
+  if ((page && isNaN(page)) || page < 1) {
     throw new CustomError(
       400,
       `Invalid query value of 'p' parameter. Positive number is only permitted`
     );
   }
-  if ((limit && isNaN(limit)) || limit < 0) {
+  if ((limit && isNaN(limit)) || limit < 1) {
     throw new CustomError(
       400,
       `Invalid query value of 'limit' parameter. Positive number is only permitted`
