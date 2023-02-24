@@ -28,6 +28,26 @@
   "GET /api/reviews": {
     "description": "serves an array of all reviews",
     "queries": ["category", "sort_by", "order"],
+    "queriesLimitation": [
+      {
+        "sort_by": [
+          "owner",
+          "title",
+          "category",
+          "created_at",
+          "votes",
+          "designer",
+          "comment_count"
+        ],
+        "order": ["ASC", "DESC"]
+      }
+    ],
+    "queriesDefaults": [
+      {
+        "sort_by": "created_at",
+        "order": "DESC"
+      }
+    ],
     "onSuccessStatusCode": 200,
     "examplePayload": {
       "reviews": [
@@ -44,6 +64,41 @@
           "comment_count": 1
         }
       ]
+    }
+  },
+  "POST /api/reviews": {
+    "description": "adds a new review",
+    "queries": [],
+    "onSuccessStatusCode": 201,
+    "requestBodyLimitations": {
+      "title": "should be at least 3 characters long",
+      "review_body": "should be at least 20 characters long",
+      "designer": "should be at least 2 characters long",
+      "review_img_url": "(optional) Default is: https://images.pexels.com/photos/163064/play-stone-network-networked-interactive-163064.jpeg?w=700&h=700"
+    },
+    "exampleRequest": {
+      "requestBody": {
+        "owner": "cooljmessy",
+        "title": "Habitats",
+        "review_body": "Habitats offers a thinky puzzle to baffle the brain...",
+        "designer": "Habitat",
+        "category": "dexterity",
+        "review_img_url": "https://i.ibb.co/8sytkzP/dogs-g54858c180-1280.jpg"
+      },
+      "examplePayload": {
+        "review": {
+          "review_id": 26,
+          "title": "Habitats",
+          "category": "dexterity",
+          "designer": "Habitat",
+          "owner": "cooljmessy",
+          "review_body": "Habitats offers a thinky puzzle to baffle the brain...",
+          "review_img_url": "https://i.ibb.co/8sytkzP/dogs-g54858c180-1280.jpg",
+          "created_at": "2023-02-24T14:41:33.312Z",
+          "votes": 0,
+          "comment_count": 0
+        }
+      }
     }
   },
   "GET /api/reviews/:review_id": {
@@ -123,6 +178,27 @@
           "created_at": "2021-03-27T19:48:58.110Z"
         }
       ]
+    }
+  },
+  "POST /api/reviews/:review_id/comments": {
+    "description": "adds a comment to a review defined by review_id",
+    "queries": [],
+    "onSuccessStatusCode": 201,
+    "exampleRequest": {
+      "requestBody": {
+        "username": "cooljmessy",
+        "body": "Amazing board game!"
+      },
+      "examplePayload": {
+        "comment": {
+          "comment_id": 63,
+          "body": "Amazing board game!",
+          "review_id": 2,
+          "author": "cooljmessy",
+          "votes": 0,
+          "created_at": "2023-02-24T14:31:29.550Z"
+        }
+      }
     }
   },
   "DELETE /api/comments/:comment_id": {

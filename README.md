@@ -16,10 +16,10 @@ You can access the hosted version of this API at https://nc-games.lendi.dev/api
 
 ## Prerequisites
 
-This API was developed and tested using:
+The minimum versions of Node.js and Postgres:
 
-* Node.js v19.2.0
-* Postgres v14.6
+* Node.js v12.x or higher
+* Postgres v10.x or higher
 
 Before you start, you should have the following installed on your machine:
 

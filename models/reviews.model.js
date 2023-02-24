@@ -72,6 +72,40 @@ const selectReviewById = async (review_id) => {
   return review;
 };
 
+const insertReview = async (newReview) => {
+  const { owner, title, review_body, designer, category, review_img_url } =
+    newReview;
+
+  const reviewImgUrl =
+    review_img_url && review_img_url.length > 0
+      ? review_img_url
+      : "https://images.pexels.com/photos/163064/play-stone-network-networked-interactive-163064.jpeg?w=700&h=700";
+
+  if (review_body && review_body.length < 20) {
+    throw new CustomError(400, 'Review body should be at least 20 characters long')
+  }
+  if (title && title.length < 3) {
+    throw new CustomError(400, 'Review title should be at least 3 characters long')
+  }
+  if (designer && designer.length < 2) {
+    throw new CustomError(400, 'Designer should be at least 2 characters long')
+  }
+
+  const {
+    rows: [insertedReview],
+  } = await db.query(
+    `
+    INSERT INTO reviews 
+      (owner, title, review_body, designer, category, review_img_url)
+    VALUES
+      ($1, $2, $3, $4, $5, $6)
+    RETURNING *, 0 AS comment_count;`,
+    [owner, title, review_body, designer, category, reviewImgUrl]
+  );
+
+  return insertedReview;
+};
+
 const updateReview = async (review_id, patchObject) => {
   const { inc_votes } = patchObject;
 
@@ -89,4 +123,9 @@ const updateReview = async (review_id, patchObject) => {
   return review;
 };
 
-module.exports = { selectReviews, selectReviewById, updateReview };
+module.exports = {
+  selectReviews,
+  selectReviewById,
+  insertReview,
+  updateReview,
+};

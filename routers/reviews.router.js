@@ -4,6 +4,7 @@ const CommentsController = require("../controllers/comments.controller");
 const reviewsRouter = require("express").Router();
 
 reviewsRouter.get("/", ReviewsController.getReviews);
+reviewsRouter.post("/", ReviewsController.postReview);
 
 reviewsRouter.get("/:review_id", ReviewsController.getReviewById);
 reviewsRouter.patch("/:review_id", ReviewsController.patchReview);

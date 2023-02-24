@@ -89,6 +89,7 @@ describe("app", () => {
     review_body: expect.any(String),
     designer: expect.any(String),
     votes: expect.any(Number),
+    comment_count: expect.any(Number),
   };
 
   describe("/api/reviews", () => {
@@ -113,7 +114,10 @@ describe("app", () => {
 
               expect(reviews).toHaveLength(13);
               expect(reviewsCommentsTotalCount).toBe(6);
-              expect(reviews).toBeSortedBy("created_at", { descending: true, coerce: true, });
+              expect(reviews).toBeSortedBy("created_at", {
+                descending: true,
+                coerce: true,
+              });
             });
         });
 
@@ -165,7 +169,10 @@ describe("app", () => {
               });
               expect(reviews).toHaveLength(1);
               expect(reviewsCommentsTotalCount).toBe(0);
-              expect(reviews).toBeSortedBy("created_at", { descending: true, coerce: true, });
+              expect(reviews).toBeSortedBy("created_at", {
+                descending: true,
+                coerce: true,
+              });
             });
         });
 
@@ -294,7 +301,7 @@ describe("app", () => {
                   expect(reviews.length).toBeGreaterThan(0);
                   expect(reviews).toBeSortedBy(sortBy, {
                     descending: order === "DESC" && true,
-                    coerce: true
+                    coerce: true,
                   });
                 });
             });
@@ -371,6 +378,196 @@ describe("app", () => {
             .expect(404)
             .then(({ body: { message } }) => {
               expect(message).toBe(`Category with slug 'superset' not found`);
+            });
+        });
+      });
+    });
+
+    describe("POST", () => {
+      describe("Successful Responses", () => {
+        test("201 - responds with a newly added review", () => {
+          const newReview = {
+            owner: "mallionaire",
+            title: "Habitats",
+            review_body:
+              "Habitats offers a thinky puzzle to baffle the brain. Optimising the array in front of you is the head-scratcher, as points are fairly limited. It is certainly fun to see your nature park grow, and attempt to meet as many scoring objectives as you can. Habitats falls into the category of games that are easy to learn but tricky to master.",
+            designer: "Habitat",
+            category: "dexterity",
+            review_img_url: "https://i.ibb.co/8sytkzP/dogs-g54858c180-1280.jpg",
+          };
+          return request(app)
+            .post("/api/reviews")
+            .send(newReview)
+            .expect(201)
+            .then(({ body: { review } }) => {
+              expect(review).toEqual(
+                expect.objectContaining({
+                  ...expectedReviewShape,
+                  ...newReview,
+                  review_id: 14,
+                })
+              );
+            });
+        });
+
+        test("201 - responds with a newly added review", () => {
+          const newReview = {
+            owner: "mallionaire",
+            title: "Habitats",
+            review_body:
+              "Habitats offers a thinky puzzle to baffle the brain. Optimising the array in front of you is the head-scratcher, as points are fairly limited. It is certainly fun to see your nature park grow, and attempt to meet as many scoring objectives as you can. Habitats falls into the category of games that are easy to learn but tricky to master.",
+            designer: "Habitat",
+            category: "dexterity",
+            review_img_url: "https://i.ibb.co/8sytkzP/dogs-g54858c180-1280.jpg",
+          };
+          return request(app)
+            .post("/api/reviews")
+            .send(newReview)
+            .expect(201)
+            .then(({ body: { review } }) => {
+              expect(review).toEqual(
+                expect.objectContaining({
+                  ...expectedReviewShape,
+                  ...newReview,
+                  review_id: 14,
+                })
+              );
+            });
+        });
+        test("201 - responds with a newly added review without review_img_url, but sets a default instead", () => {
+          const newReview = {
+            owner: "mallionaire",
+            title: "Habitats",
+            review_body:
+              "Habitats offers a thinky puzzle to baffle the brain. Optimising the array in front of you is the head-scratcher, as points are fairly limited. It is certainly fun to see your nature park grow, and attempt to meet as many scoring objectives as you can. Habitats falls into the category of games that are easy to learn but tricky to master.",
+            designer: "Habitat",
+            category: "dexterity",
+          };
+          return request(app)
+            .post("/api/reviews")
+            .send(newReview)
+            .expect(201)
+            .then(({ body: { review } }) => {
+              expect(review).toEqual(
+                expect.objectContaining({
+                  ...expectedReviewShape,
+                  ...newReview,
+                  review_id: 14,
+                  review_img_url:
+                    "https://images.pexels.com/photos/163064/play-stone-network-networked-interactive-163064.jpeg?w=700&h=700",
+                })
+              );
+            });
+        });
+      });
+      describe("Unsuccessful Responses", () => {
+        test("400 - responds with bad request error message when wrong object type passed in", () => {
+          const newReview = "";
+          return request(app)
+            .post("/api/reviews")
+            .send(newReview)
+            .expect(400)
+            .then(({ body: { message } }) => {
+              expect(message).toBe("Bad request");
+            });
+        });
+
+        test("404 - responds with custom not found error message when valid object passed in but owner does not exists", () => {
+          const newReview = {
+            owner: "mallionaire2",
+            title: "Habitats",
+            review_body:
+              "Habitats offers a thinky puzzle to baffle the brain. Optimising the array in front of you is the head-scratcher, as points are fairly limited. It is certainly fun to see your nature park grow, and attempt to meet as many scoring objectives as you can. Habitats falls into the category of games that are easy to learn but tricky to master.",
+            designer: "Habitat",
+            category: "dexterity",
+          };
+          return request(app)
+            .post("/api/reviews")
+            .send(newReview)
+            .expect(404)
+            .then(({ body: { message } }) => {
+              expect(message).toBe(
+                `Owner with username '${newReview.owner}' not found`
+              );
+            });
+        });
+
+        test("404 - responds with custom not found error message when valid object passed in but category does not exists", () => {
+          const newReview = {
+            owner: "mallionaire",
+            title: "Habitats",
+            review_body:
+              "Habitats offers a thinky puzzle to baffle the brain. Optimising the array in front of you is the head-scratcher, as points are fairly limited. It is certainly fun to see your nature park grow, and attempt to meet as many scoring objectives as you can. Habitats falls into the category of games that are easy to learn but tricky to master.",
+            designer: "Habitat",
+            category: "dexterity22",
+          };
+          return request(app)
+            .post("/api/reviews")
+            .send(newReview)
+            .expect(404)
+            .then(({ body: { message } }) => {
+              expect(message).toBe(
+                `Category with slug '${newReview.category}' not found`
+              );
+            });
+        });
+
+        test("400 - responds with custom error message when when valid object passed in but review body is less then 20 characters", () => {
+          const newReview = {
+            owner: "mallionaire",
+            title: "Habitats",
+            review_body: "Hab",
+            designer: "Habitat",
+            category: "dexterity",
+          };
+          return request(app)
+            .post("/api/reviews")
+            .send(newReview)
+            .expect(400)
+            .then(({ body: { message } }) => {
+              expect(message).toBe(
+                `Review body should be at least 20 characters long`
+              );
+            });
+        });
+
+        test("400 - responds with custom error message when when valid object passed in but review title is less then 3 characters", () => {
+          const newReview = {
+            owner: "mallionaire",
+            title: "Ha",
+            review_body:
+              "Habitats offers a thinky puzzle to baffle the brain. Optimising the array in front of you is the head-scratcher.",
+            designer: "Habitat",
+            category: "dexterity",
+          };
+          return request(app)
+            .post("/api/reviews")
+            .send(newReview)
+            .expect(400)
+            .then(({ body: { message } }) => {
+              expect(message).toBe(
+                `Review title should be at least 3 characters long`
+              );
+            });
+        });
+
+        test("400 - responds with custom error message when when valid object passed in but designer field is less then 2 characters", () => {
+          const newReview = {
+            owner: "mallionaire",
+            title: "Habitats",
+            review_body:
+              "Habitats offers a thinky puzzle to baffle the brain. Optimising the array in front of you is the head-scratcher.",
+            designer: "H",
+            category: "dexterity",
+          };
+          return request(app)
+            .post("/api/reviews")
+            .send(newReview)
+            .expect(400)
+            .then(({ body: { message } }) => {
+              expect(message).toBe(
+                `Designer should be at least 2 characters long`
+              );
             });
         });
       });
@@ -616,7 +813,10 @@ describe("app", () => {
                 });
               });
               expect(comments).toHaveLength(3);
-              expect(comments).toBeSortedBy("created_at", { descending: true, coerce: true, });
+              expect(comments).toBeSortedBy("created_at", {
+                descending: true,
+                coerce: true,
+              });
             });
         });
 
@@ -744,7 +944,7 @@ describe("app", () => {
             });
         });
 
-        test("400 - responds with message 'Bad request' when user doesn't exist", () => {
+        test("404 - responds with message 'Bad request' when user doesn't exist", () => {
           const reviewId = 1;
           const comment = {
             username: "mallionaire2222",
@@ -753,11 +953,11 @@ describe("app", () => {
           return request(app)
             .post(`/api/reviews/${reviewId}/comments`)
             .send(comment)
-            .expect(400)
-            .then(({ body }) => {
-              const { message } = body;
-
-              expect(message).toBe("Bad request");
+            .expect(404)
+            .then(({ body: { message } }) => {
+              expect(message).toBe(
+                `User with username '${comment.username}' not found`
+              );
             });
         });
 
@@ -1083,31 +1283,33 @@ describe("app", () => {
   });
 
   describe("/api/non-existent-endpoint", () => {
-    describe("GET", () => {
-      test("404 - responds with custom not found error message", () => {
-        return request(app)
-          .get("/api/non-existent-endpoint")
-          .expect(404)
-          .then(({ body }) => {
-            expect(body).toHaveProperty(
-              "message",
-              "GET /api/non-existent-endpoint not found"
-            );
-          });
+    describe("Unsuccessful Responses", () => {
+      describe("GET", () => {
+        test("404 - responds with custom not found error message", () => {
+          return request(app)
+            .get("/api/non-existent-endpoint")
+            .expect(404)
+            .then(({ body }) => {
+              expect(body).toHaveProperty(
+                "message",
+                "GET /api/non-existent-endpoint not found"
+              );
+            });
+        });
       });
-    });
 
-    describe("POST", () => {
-      test("404 - responds with custom not found error message", () => {
-        return request(app)
-          .post("/api/post_it")
-          .expect(404)
-          .then(({ body }) => {
-            expect(body).toHaveProperty(
-              "message",
-              "POST /api/post_it not found"
-            );
-          });
+      describe("POST", () => {
+        test("404 - responds with custom not found error message", () => {
+          return request(app)
+            .post("/api/post_it")
+            .expect(404)
+            .then(({ body }) => {
+              expect(body).toHaveProperty(
+                "message",
+                "POST /api/post_it not found"
+              );
+            });
+        });
       });
     });
   });

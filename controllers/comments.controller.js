@@ -24,6 +24,11 @@ const postCommentByReviewId = async (req, res, next) => {
 
   try {
     await checkIsExistsIn("reviews", "review_id", review_id, "Review");
+
+    if (commentToPost.username) {
+      await checkIsExistsIn("users", "username", commentToPost.username, "User");
+    }
+
     const comment = await insertCommentByReviewId(review_id, commentToPost);
 
     res.status(201).send({ comment });
