@@ -136,7 +136,7 @@ describe("app", () => {
           return request(app)
             .get("/api/reviews?p=2&limit=10")
             .expect(200)
-            .then(({ body: { max_page, total_count, reviews } }) => {
+            .then(({ body: { max_pages, total_count, reviews } }) => {
               reviews.forEach((review) => {
                 expect(review).toEqual(
                   expect.objectContaining(expectedReviewShape)
@@ -144,7 +144,7 @@ describe("app", () => {
               });
               expect(total_count).toBe(13);
               expect(reviews).toHaveLength(3);
-              expect(max_page).toBe(2);
+              expect(max_pages).toBe(2);
             });
         });
 
@@ -327,13 +327,13 @@ describe("app", () => {
         });
       });
       describe("Unsuccessful Responses", () => {
-        test("400 - responds with custom error message 'Wrong query parameter of 'order'. ASC or DESC are only permitted' when not permitted order query value requested", () => {
+        test("400 - responds with custom error message 'Invalid query value of 'order' parameter. ASC or DESC are only permitted' when not permitted order query value requested", () => {
           return request(app)
             .get(`/api/reviews?order=descending`)
             .expect(400)
             .then(({ body: { message } }) => {
               expect(message).toBe(
-                "Wrong query parameter of 'order'. ASC or DESC are only permitted"
+                "Invalid query value of 'order' parameter. ASC or DESC are only permitted"
               );
             });
         });
@@ -405,13 +405,13 @@ describe("app", () => {
         });
       });
       describe("Unsuccessful Responses", () => {
-        test("400 - responds with custom error message 'Wrong query parameter of 'order'. ASC or DESC are only permitted' when not permitted order query value requested and category is valid", () => {
+        test("400 - responds with custom error message 'Invalid query value of 'order' parameter. ASC or DESC are only permitted' when not permitted order query value requested and category is valid", () => {
           return request(app)
             .get(`/api/reviews?category=dexterity&order=ASCC`)
             .expect(400)
             .then(({ body: { message } }) => {
               expect(message).toBe(
-                "Wrong query parameter of 'order'. ASC or DESC are only permitted"
+                "Invalid query value of 'order' parameter. ASC or DESC are only permitted"
               );
             });
         });
@@ -439,7 +439,7 @@ describe("app", () => {
             .expect(400)
             .then(({ body: { message } }) => {
               expect(message).toBe(
-                `Query value of 'p' should be a positive number`
+                `Invalid query value of 'p' parameter. Positive number is only permitted`
               );
             });
         });
@@ -451,7 +451,7 @@ describe("app", () => {
             .expect(400)
             .then(({ body: { message } }) => {
               expect(message).toBe(
-                `Query value of 'limit' should be a positive number`
+                `Invalid query value of 'limit' parameter. Positive number is only permitted`
               );
             });
         });
@@ -464,7 +464,7 @@ describe("app", () => {
             .expect(400)
             .then(({ body: { message } }) => {
               expect(message).toBe(
-                `Query value of 'limit' should be a positive number`
+                `Invalid query value of 'limit' parameter. Positive number is only permitted`
               );
             });
         });
@@ -477,7 +477,7 @@ describe("app", () => {
             .expect(400)
             .then(({ body: { message } }) => {
               expect(message).toBe(
-                `Query value of 'p' should be a positive number`
+                `Invalid query value of 'p' parameter. Positive number is only permitted`
               );
             });
         });
@@ -751,7 +751,7 @@ describe("app", () => {
             .then(({ body }) => {
               const { message } = body;
 
-              expect(message).toBe(`Review with review_id '${reviewId}' found`);
+              expect(message).toBe(`Review with review_id '${reviewId}' not found`);
             });
         });
       });
@@ -1124,7 +1124,7 @@ describe("app", () => {
             .then(({ body }) => {
               const { message } = body;
 
-              expect(message).toBe("Comment cannot be empty");
+              expect(message).toBe("Comment body cannot be empty");
             });
         });
       });
