@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node: ['latest'] #, 14, 16, 18, "latest"
+        node: [12, 14, 16, 18, "latest"] #, 14, 16, 18, "latest"
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
@@ -27,7 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node: ['latest'] #, 14, 16, 18, "latest"
+        node: [12, 14, 16, 18, "latest"] #, 14, 16, 18, "latest"
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
@@ -41,7 +41,7 @@ jobs:
       - name: Setup Postgres
         uses: harmon758/postgresql-action@v1
         with:
-          postgresql version: '14.6'
+          postgresql version: '10'
           postgresql db: 'nc_games_test'
           postgresql user: 'test_user'
           postgresql password: 'secret_password'
