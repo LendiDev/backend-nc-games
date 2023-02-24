@@ -385,7 +385,7 @@ describe("app", () => {
 
     describe("POST", () => {
       describe("Successful Responses", () => {
-        test("200 - responds with a newly added review", () => {
+        test("201 - responds with a newly added review", () => {
           const newReview = {
             owner: "mallionaire",
             title: "Habitats",
@@ -398,7 +398,7 @@ describe("app", () => {
           return request(app)
             .post("/api/reviews")
             .send(newReview)
-            .expect(200)
+            .expect(201)
             .then(({ body: { review } }) => {
               expect(review).toEqual(
                 expect.objectContaining({
@@ -411,7 +411,7 @@ describe("app", () => {
         });
       });
 
-      test("200 - responds with a newly added review", () => {
+      test("201 - responds with a newly added review", () => {
         const newReview = {
           owner: "mallionaire",
           title: "Habitats",
@@ -424,7 +424,7 @@ describe("app", () => {
         return request(app)
           .post("/api/reviews")
           .send(newReview)
-          .expect(200)
+          .expect(201)
           .then(({ body: { review } }) => {
             expect(review).toEqual(
               expect.objectContaining({
@@ -435,7 +435,7 @@ describe("app", () => {
             );
           });
       });
-      test("200 - responds with a newly added review without review_img_url, but sets a default instead", () => {
+      test("201 - responds with a newly added review without review_img_url, but sets a default instead", () => {
         const newReview = {
           owner: "mallionaire",
           title: "Habitats",
@@ -447,7 +447,7 @@ describe("app", () => {
         return request(app)
           .post("/api/reviews")
           .send(newReview)
-          .expect(200)
+          .expect(201)
           .then(({ body: { review } }) => {
             expect(review).toEqual(
               expect.objectContaining({
@@ -486,7 +486,9 @@ describe("app", () => {
             .send(newReview)
             .expect(404)
             .then(({ body: { message } }) => {
-              expect(message).toBe(`Owner with username '${newReview.owner}' not found`);
+              expect(message).toBe(
+                `Owner with username '${newReview.owner}' not found`
+              );
             });
         });
 
@@ -504,7 +506,9 @@ describe("app", () => {
             .send(newReview)
             .expect(404)
             .then(({ body: { message } }) => {
-              expect(message).toBe(`Category with slug '${newReview.category}' not found`);
+              expect(message).toBe(
+                `Category with slug '${newReview.category}' not found`
+              );
             });
         });
 
@@ -512,8 +516,7 @@ describe("app", () => {
           const newReview = {
             owner: "mallionaire",
             title: "Habitats",
-            review_body:
-              "Hab",
+            review_body: "Hab",
             designer: "Habitat",
             category: "dexterity",
           };
@@ -522,7 +525,9 @@ describe("app", () => {
             .send(newReview)
             .expect(400)
             .then(({ body: { message } }) => {
-              expect(message).toBe(`Review body should be at least 20 characters long`);
+              expect(message).toBe(
+                `Review body should be at least 20 characters long`
+              );
             });
         });
 
@@ -540,11 +545,13 @@ describe("app", () => {
             .send(newReview)
             .expect(400)
             .then(({ body: { message } }) => {
-              expect(message).toBe(`Review title should be at least 3 characters long`);
+              expect(message).toBe(
+                `Review title should be at least 3 characters long`
+              );
             });
         });
 
-        test("400 - responds with custom error message when when valid object passed in but review title is less then 2 characters", () => {
+        test("400 - responds with custom error message when when valid object passed in but designer field is less then 2 characters", () => {
           const newReview = {
             owner: "mallionaire",
             title: "Habitats",
@@ -558,7 +565,9 @@ describe("app", () => {
             .send(newReview)
             .expect(400)
             .then(({ body: { message } }) => {
-              expect(message).toBe(`Designer should be at least 2 characters long`);
+              expect(message).toBe(
+                `Designer should be at least 2 characters long`
+              );
             });
         });
       });
@@ -935,7 +944,7 @@ describe("app", () => {
             });
         });
 
-        test("400 - responds with message 'Bad request' when user doesn't exist", () => {
+        test("404 - responds with message 'Bad request' when user doesn't exist", () => {
           const reviewId = 1;
           const comment = {
             username: "mallionaire2222",
@@ -944,11 +953,11 @@ describe("app", () => {
           return request(app)
             .post(`/api/reviews/${reviewId}/comments`)
             .send(comment)
-            .expect(400)
-            .then(({ body }) => {
-              const { message } = body;
-
-              expect(message).toBe("Bad request");
+            .expect(404)
+            .then(({ body: { message } }) => {
+              expect(message).toBe(
+                `User with username '${comment.username}' not found`
+              );
             });
         });
 
