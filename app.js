@@ -13,7 +13,7 @@ app.use(express.json());
 
 app.use('/api', apiRouter);
 
-app.all("/*", notFoundErrorHandler);
+app.all("*", notFoundErrorHandler);
 app.use(customErrorHandler, psqlErrorHandler, internalErrorHandler);
 
 module.exports = app;
