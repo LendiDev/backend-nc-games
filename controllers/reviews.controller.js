@@ -2,6 +2,7 @@ const {
   selectReviews,
   selectReviewById,
   updateReview,
+  insertReview,
 } = require("../models/reviews.model");
 const checkIsExistsIn = require("../utils/db/check-is-exists-in-db");
 
@@ -32,6 +33,29 @@ const getReviewById = async (req, res, next) => {
   }
 };
 
+const postReview = async (req, res, next) => {
+  const { body: newReview } = req;
+
+  try {
+    if (newReview.category) {
+      await checkIsExistsIn(
+        "categories",
+        "slug",
+        newReview.category,
+        "Category"
+      );
+    }
+    if (newReview.owner) {
+      await checkIsExistsIn("users", "username", newReview.owner, "Owner");
+    }
+    const review = await insertReview(newReview);
+
+    res.status(200).send({ review });
+  } catch (err) {
+    next(err);
+  }
+};
+
 const patchReview = async (req, res, next) => {
   const { review_id } = req.params;
   const patchObject = req.body;
@@ -46,4 +70,4 @@ const patchReview = async (req, res, next) => {
   }
 };
 
-module.exports = { getReviews, getReviewById, patchReview };
+module.exports = { getReviews, getReviewById, postReview, patchReview };
