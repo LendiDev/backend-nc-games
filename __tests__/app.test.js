@@ -250,7 +250,7 @@ describe("app", () => {
       });
     });
 
-    describe("GET ?category=...$order=...", () => {
+    describe("GET ?category=...&order=...", () => {
       describe("Successful Responses", () => {
         test("200 - responds with an array of reviews objects based on category value and should be in ascending order by created_at (default)", () => {
           return request(app)
@@ -371,7 +371,7 @@ describe("app", () => {
       });
     });
 
-    describe("GET ?category=...sort_by=...&order=...", () => {
+    describe("GET ?category=...&sort_by=...&order=...", () => {
       describe("Successful Responses", () => {
         reviewsCategories.forEach(({ slug, expectedLength }) => {
           reviewsOrderWhitelist.forEach((order) => {
