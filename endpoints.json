@@ -28,28 +28,26 @@
   "GET /api/reviews": {
     "description": "serves an array of all reviews",
     "queries": ["category", "sort_by", "order", "p", "limit"],
-    "queriesLimitation": [
-      {
-        "sort_by": [
-          "owner",
-          "title",
-          "category",
-          "created_at",
-          "votes",
-          "designer",
-          "comment_count"
-        ],
-        "order": ["ASC", "DESC"]
-      }
-    ],
-    "queriesDefaults": [
-      {
-        "sort_by": "created_at",
-        "order": "DESC",
-        "p": "1",
-        "limit": "10"
-      }
-    ],
+    "queriesLimitation": {
+      "sort_by": [
+        "owner",
+        "title",
+        "category",
+        "created_at",
+        "votes",
+        "designer",
+        "comment_count"
+      ],
+      "order": ["ASC", "DESC"],
+      "p": "positive number",
+      "limit": "positive number"
+    },
+    "queriesDefaults": {
+      "sort_by": "created_at",
+      "order": "DESC",
+      "p": "1",
+      "limit": "10"
+    },
     "onSuccessStatusCode": 200,
     "examplePayload": {
       "total_count": 13,
@@ -169,9 +167,19 @@
   },
   "GET /api/reviews/:review_id/comments": {
     "description": "serves an array of comments for a review defined by review id",
-    "queries": [],
+    "queries": ["p", "limit"],
+    "queriesLimitation": {
+      "p": "positive number",
+      "limit": "positive number"
+    },
+    "queriesDefaults": {
+      "p": "1",
+      "limit": "10"
+    },
     "onSuccessStatusCode": 200,
     "examplePayload": {
+      "total_count": 3,
+      "max_pages": 1,
       "comments": [
         {
           "comment_id": 7,
