@@ -78,7 +78,7 @@ const selectReviews = async (
     throw new CustomError(400, `Page is out of range`);
   }
 
-  return { total_count, max_pages, reviews: reviews ? reviews : [] };
+  return { total_count, max_pages, reviews: reviews || [] };
 };
 
 const selectReviewById = async (review_id) => {
