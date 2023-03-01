@@ -8,11 +8,12 @@ const checkIsExistsIn = require("../utils/db/check-is-exists-in-db");
 
 const getCommentsByReviewId = async (req, res, next) => {
   const { review_id } = req.params;
+  const { p, limit } = req.query;
   try {
     await checkIsExistsIn("reviews", "review_id", review_id, "Review");
-    const comments = await selectCommentsByReviewId(review_id);
+    const comments = await selectCommentsByReviewId(review_id, p, limit);
 
-    res.status(200).send({ comments });
+    res.status(200).send(comments);
   } catch (err) {
     next(err);
   }

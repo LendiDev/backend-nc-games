@@ -250,7 +250,7 @@ describe("app", () => {
       });
     });
 
-    describe("GET ?category=...$order=...", () => {
+    describe("GET ?category=...&order=...", () => {
       describe("Successful Responses", () => {
         test("200 - responds with an array of reviews objects based on category value and should be in ascending order by created_at (default)", () => {
           return request(app)
@@ -371,7 +371,7 @@ describe("app", () => {
       });
     });
 
-    describe("GET ?category=...sort_by=...&order=...", () => {
+    describe("GET ?category=...&sort_by=...&order=...", () => {
       describe("Successful Responses", () => {
         reviewsCategories.forEach(({ slug, expectedLength }) => {
           reviewsOrderWhitelist.forEach((order) => {
@@ -968,6 +968,213 @@ describe("app", () => {
               const { message } = body;
 
               expect(message).toBe("Bad request");
+            });
+        });
+        test("404 - responds with message 'Review not found' when review_id doesn't exist", () => {
+          const reviewId = 99999999;
+          return request(app)
+            .get(`/api/reviews/${reviewId}/comments`)
+            .expect(404)
+            .then(({ body }) => {
+              const { message } = body;
+              expect(message).toBe(
+                `Review with review_id '${reviewId}' not found`
+              );
+            });
+        });
+      });
+    });
+
+    describe("GET ?p=...&limit=...", () => {
+      describe("Successful Responses", () => {
+        test("200 - responds with an array of comments for specific review_id and should be sorted by created_at in descending order and should be limited by 2", () => {
+          const reviewId = 2;
+          return request(app)
+            .get(`/api/reviews/${reviewId}/comments?p=2&limit=2`)
+            .expect(200)
+            .then(({ body: { comments, total_count, max_pages } }) => {
+              comments.forEach((comment) => {
+                expect(comment).toMatchObject({
+                  comment_id: expect.any(Number),
+                  votes: expect.any(Number),
+                  created_at: expect.any(String),
+                  author: expect.any(String),
+                  body: expect.any(String),
+                  review_id: reviewId,
+                });
+              });
+              expect(total_count).toBe(3);
+              expect(max_pages).toBe(2);
+              expect(comments).toHaveLength(1);
+              expect(comments).toBeSortedBy("created_at", {
+                descending: true,
+                coerce: true,
+              });
+            });
+        });
+
+        test("200 - responds with an array of comments for specific review_id and should be sorted by created_at in descending order and should be not be limited", () => {
+          const reviewId = 2;
+          return request(app)
+            .get(`/api/reviews/${reviewId}/comments?p=1`)
+            .expect(200)
+            .then(({ body: { comments, total_count, max_pages } }) => {
+              comments.forEach((comment) => {
+                expect(comment).toMatchObject({
+                  comment_id: expect.any(Number),
+                  votes: expect.any(Number),
+                  created_at: expect.any(String),
+                  author: expect.any(String),
+                  body: expect.any(String),
+                  review_id: reviewId,
+                });
+              });
+              expect(total_count).toBe(3);
+              expect(max_pages).toBe(1);
+              expect(comments).toHaveLength(3);
+              expect(comments).toBeSortedBy("created_at", {
+                descending: true,
+                coerce: true,
+              });
+            });
+        });
+        test("200 - responds with an array of comments for specific review_id and should be sorted by created_at in descending order and should be not be limited", () => {
+          const reviewId = 2;
+          return request(app)
+            .get(`/api/reviews/${reviewId}/comments?limit=1`)
+            .expect(200)
+            .then(({ body: { comments, total_count, max_pages } }) => {
+              comments.forEach((comment) => {
+                expect(comment).toMatchObject({
+                  comment_id: expect.any(Number),
+                  votes: expect.any(Number),
+                  created_at: expect.any(String),
+                  author: expect.any(String),
+                  body: expect.any(String),
+                  review_id: reviewId,
+                });
+              });
+              expect(total_count).toBe(3);
+              expect(max_pages).toBe(3);
+              expect(comments).toHaveLength(1);
+              expect(comments).toBeSortedBy("created_at", {
+                descending: true,
+                coerce: true,
+              });
+            });
+        });
+        test("400 - responds with custom error message when query is valid but a value of limit not a number", () => {
+          const reviewId = 2;
+          return request(app)
+            .get(
+              `/api/reviews/${reviewId}/comments?limit=last`
+            )
+            .expect(400)
+            .then(({ body: { message } }) => {
+              expect(message).toBe(
+                `Invalid query value of 'limit' parameter. Positive number is only permitted`
+              );
+            });
+        });
+        test("400 - responds with custom error message when query is valid but a value of limit is negative", () => {
+          const reviewId = 2;
+          return request(app)
+            .get(
+              `/api/reviews/${reviewId}/comments?limit=-10`
+            )
+            .expect(400)
+            .then(({ body: { message } }) => {
+              expect(message).toBe(
+                `Invalid query value of 'limit' parameter. Positive number is only permitted`
+              );
+            });
+        });
+        test("400 - responds with custom error message when query is valid but a value of limit is 0", () => {
+          const reviewId = 2;
+          return request(app)
+            .get(
+              `/api/reviews/${reviewId}/comments?limit=0`
+            )
+            .expect(400)
+            .then(({ body: { message } }) => {
+              expect(message).toBe(
+                `Invalid query value of 'limit' parameter. Positive number is only permitted`
+              );
+            });
+        });
+        test("400 - responds with custom error message when query is valid but a value of p (page) not a number", () => {
+          const reviewId = 2;
+          return request(app)
+            .get(
+              `/api/reviews/${reviewId}/comments?p=last`
+            )
+            .expect(400)
+            .then(({ body: { message } }) => {
+              expect(message).toBe(
+                `Invalid query value of 'p' parameter. Positive number is only permitted`
+              );
+            });
+        });
+        test("400 - responds with custom error message when query is valid but a value of p is negative", () => {
+          const reviewId = 2;
+          return request(app)
+            .get(
+              `/api/reviews/${reviewId}/comments?p=-100&limit=10`
+            )
+            .expect(400)
+            .then(({ body: { message } }) => {
+              expect(message).toBe(
+                `Invalid query value of 'p' parameter. Positive number is only permitted`
+              );
+            });
+        });
+        test("400 - responds with custom error message when query is valid but a value of p is zero", () => {
+          const reviewId = 2;
+          return request(app)
+            .get(
+              `/api/reviews/${reviewId}/comments?p=0`
+            )
+            .expect(400)
+            .then(({ body: { message } }) => {
+              expect(message).toBe(
+                `Invalid query value of 'p' parameter. Positive number is only permitted`
+              );
+            });
+        });
+        test("400 - responds with custom error message when p is out of range", () => {
+          const reviewId = 2;
+          return request(app)
+            .get(
+              `/api/reviews/${reviewId}/comments?p=10`
+            )
+            .expect(400)
+            .then(({ body: { message } }) => {
+              expect(message).toBe(`Page is out of range`);
+            });
+        });
+      });
+      describe("Unsuccessful Responses", () => {
+        test("400 - responds with message 'Bad request' when wrong type of review_id passed in, but queries are valid", () => {
+          const reviewId = "two";
+          return request(app)
+            .get(`/api/reviews/${reviewId}/comments?p=1&limit=2`)
+            .expect(400)
+            .then(({ body }) => {
+              const { message } = body;
+
+              expect(message).toBe("Bad request");
+            });
+        });
+        test("404 - responds with message 'Review not found' when review_id doesn't exist, but queries are valid", () => {
+          const reviewId = 99999999;
+          return request(app)
+            .get(`/api/reviews/${reviewId}/comments?p=1&limit=2`)
+            .expect(404)
+            .then(({ body }) => {
+              const { message } = body;
+              expect(message).toBe(
+                `Review with review_id '${reviewId}' not found`
+              );
             });
         });
         test("404 - responds with message 'Review not found' when review_id doesn't exist", () => {

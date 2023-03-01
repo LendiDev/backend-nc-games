@@ -15,7 +15,14 @@
     "type": "git",
     "url": "git+https://github.com/LendiDev/backend-nc-games.git"
   },
-  "keywords": ["back-end", "restful", "api", "nc", "northcoders", "boardgames"],
+  "keywords": [
+    "back-end",
+    "restful",
+    "api",
+    "nc",
+    "northcoders",
+    "boardgames"
+  ],
   "author": "Nikita Lendiak",
   "license": "ISC",
   "bugs": {
