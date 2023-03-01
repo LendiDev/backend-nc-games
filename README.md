@@ -1,34 +1,24 @@
-# Northcoders House of Games API
-
 ![Units tests and E2E tests workflow](https://github.com/LendiDev/backend-nc-games/actions/workflows/run-tests.yml/badge.svg)
 
-<br/>
+# Northcoders House of Games API
 
-This is RESTful API for NC House of Games Front-End that designed to serve reviews, comments, users, categories related to board games. The API is built using NodeJS, Express, PostgreSQL, and is designed to be fast, scalable, and easy to use.
+This is RESTful API for NC House of Games Front-End that designed to serve reviews, comments, users, categories related to board games. The API is built using Node.js, Express, PostgreSQL, and is designed to be fast, scalable, and easy to use.
 
 The users can access reviews on board games from other users and comments on those reviews. They can also post and delete comments for the reviews.
 
-<br/>
+## Live version
 
-## Hosted Version
-
-You can access the hosted version of this API at https://nc-games.lendi.dev/api
-
-<br/>
+Live version of this API can be found at https://nc-games.lendi.dev/api
 
 ## Prerequisites
 
-The minimum versions of Node.js and Postgres:
+The minimum required versions of Node.js and Postgres:
 
 * Node.js v12.x or higher
 * Postgres v10.x or higher
 
-Before you start, you should have the following installed on your machine:
-
-* You can download Node.js from the official website: https://nodejs.org/.
-* You can download Postgres from the official website: https://www.postgresql.org/.
-
-<br/>
+> You can download Node.js from https://nodejs.org/.  
+> You can download Postgres from https://www.postgresql.org/.
 
 ## Getting started
 
@@ -53,7 +43,7 @@ To install and run this API locally, follow these steps:
 
    The example of file content can be found in ```.env-example```. 
 
-    Or here is an example how they should look like:
+   Alternatively,  here is an example how they should look like:
 
     `.env.development`
     ```
@@ -69,7 +59,7 @@ To install and run this API locally, follow these steps:
 
    Update the database names in `./db/setup.sql` according to your environment variables.
 
-   Make sure that you have **PostgresSQL** installed and it is running on your local machine.
+   Make sure that you have **PostgresSQL** running on your local machine.
 
    Create local databases using `npm`:
 
@@ -77,8 +67,7 @@ To install and run this API locally, follow these steps:
     npm run setup-dbs
     ```
 
-
-   Seed the local database with some sample data:
+    Seed the local database with some sample data:
 
     ```sh
     npm run seed
@@ -92,7 +81,7 @@ To install and run this API locally, follow these steps:
 
    The API should now be running at http://localhost:9090.
     
-<br/>
+
 
 ### Testing
 
@@ -106,4 +95,3 @@ To run the tests for this API, follow this step:
     ```
 
 The tests should now be run, and you should see the results in the console.
-
