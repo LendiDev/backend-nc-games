@@ -33,10 +33,6 @@ const selectCommentsByReviewId = async (review_id, page, limit) => {
 
   const max_pages = Math.ceil(total_count / limit_rows);
 
-  if (page > max_pages) {
-    throw new CustomError(400, `Page is out of range`);
-  }
-
   return { total_count, max_pages, comments: comments || [] };
 };
 
