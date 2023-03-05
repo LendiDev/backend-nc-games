@@ -52,10 +52,10 @@ const selectReviews = async (
   const { offset, limit: limit_rows } = pagination(page, limit);
 
   const {
-    rows: [{ reviews, total_count }],
+    rows: [{ json_reviews: reviews, total_count }],
   } = await db.query(
     `
-      SELECT (SELECT CAST(COUNT(*) AS INT) FROM reviews ${whereQueryString}) as total_count, (SELECT json_agg(reviews.*) AS reviews FROM (
+      SELECT (SELECT CAST(COUNT(*) AS INT) FROM reviews ${whereQueryString}) as total_count, (SELECT json_agg(x) AS json_reviews FROM (
           SELECT 
               reviews.*, CAST(COUNT(comments.review_id) as INT) as comment_count 
           FROM 
@@ -64,10 +64,10 @@ const selectReviews = async (
           ${whereQueryString}
           GROUP BY 
               reviews.review_id
-          ORDER BY ${sort_by} ${order}
+          ORDER BY ${sort_by} ${order}, review_id
           OFFSET ${offset}
-          LIMIT ${limit_rows}
-      ) AS reviews);
+          FETCH NEXT ${limit_rows} ROWS ONLY
+      ) AS x);
   `,
     queryValues
   );
