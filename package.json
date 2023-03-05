@@ -9,7 +9,7 @@
     "seed-prod": "NODE_ENV=production npm run seed",
     "test": "jest",
     "prepare": "husky install",
-    "start": "node ./listen.js"
+    "start": "node --watch ./listen.js"
   },
   "repository": {
     "type": "git",

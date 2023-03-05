@@ -132,6 +132,17 @@ describe("app", () => {
             });
         });
 
+        test("200 - responds with empty reviews array when p is out of range", () => {
+          return request(app)
+            .get(`/api/reviews?p=100&limit=10`)
+            .expect(200)
+            .then(({ body: { max_pages, total_count, reviews } }) => {
+              expect(reviews).toHaveLength(0);
+              expect(total_count).toBe(13);
+              expect(max_pages).toBe(2);
+            });
+        });
+
         test("200 - responds with an array of reviews objects if page is 2 and limit 10", async () => {
           return request(app)
             .get("/api/reviews?p=2&limit=10")
@@ -513,16 +524,6 @@ describe("app", () => {
               expect(message).toBe(
                 `Invalid query value of 'p' parameter. Positive number is only permitted`
               );
-            });
-        });
-        test("400 - responds with custom error message when p is out of range", () => {
-          return request(app)
-            .get(
-              `/api/reviews?category=dexterity&sort_by=owner&order=ASC&p=100&limit=10`
-            )
-            .expect(400)
-            .then(({ body: { message } }) => {
-              expect(message).toBe(`Page is out of range`);
             });
         });
       });
@@ -1063,12 +1064,21 @@ describe("app", () => {
               });
             });
         });
+        test("200 - responds with empty comments array when p is out of range", () => {
+          const reviewId = 2;
+          return request(app)
+            .get(`/api/reviews/${reviewId}/comments?p=10`)
+            .expect(200)
+            .then(({ body: { comments, total_count, max_pages } }) => {
+              expect(total_count).toBe(3);
+              expect(max_pages).toBe(1);
+              expect(comments).toHaveLength(0);
+            });
+        });
         test("400 - responds with custom error message when query is valid but a value of limit not a number", () => {
           const reviewId = 2;
           return request(app)
-            .get(
-              `/api/reviews/${reviewId}/comments?limit=last`
-            )
+            .get(`/api/reviews/${reviewId}/comments?limit=last`)
             .expect(400)
             .then(({ body: { message } }) => {
               expect(message).toBe(
@@ -1079,9 +1089,7 @@ describe("app", () => {
         test("400 - responds with custom error message when query is valid but a value of limit is negative", () => {
           const reviewId = 2;
           return request(app)
-            .get(
-              `/api/reviews/${reviewId}/comments?limit=-10`
-            )
+            .get(`/api/reviews/${reviewId}/comments?limit=-10`)
             .expect(400)
             .then(({ body: { message } }) => {
               expect(message).toBe(
@@ -1092,9 +1100,7 @@ describe("app", () => {
         test("400 - responds with custom error message when query is valid but a value of limit is 0", () => {
           const reviewId = 2;
           return request(app)
-            .get(
-              `/api/reviews/${reviewId}/comments?limit=0`
-            )
+            .get(`/api/reviews/${reviewId}/comments?limit=0`)
             .expect(400)
             .then(({ body: { message } }) => {
               expect(message).toBe(
@@ -1105,9 +1111,7 @@ describe("app", () => {
         test("400 - responds with custom error message when query is valid but a value of p (page) not a number", () => {
           const reviewId = 2;
           return request(app)
-            .get(
-              `/api/reviews/${reviewId}/comments?p=last`
-            )
+            .get(`/api/reviews/${reviewId}/comments?p=last`)
             .expect(400)
             .then(({ body: { message } }) => {
               expect(message).toBe(
@@ -1118,9 +1122,7 @@ describe("app", () => {
         test("400 - responds with custom error message when query is valid but a value of p is negative", () => {
           const reviewId = 2;
           return request(app)
-            .get(
-              `/api/reviews/${reviewId}/comments?p=-100&limit=10`
-            )
+            .get(`/api/reviews/${reviewId}/comments?p=-100&limit=10`)
             .expect(400)
             .then(({ body: { message } }) => {
               expect(message).toBe(
@@ -1131,25 +1133,12 @@ describe("app", () => {
         test("400 - responds with custom error message when query is valid but a value of p is zero", () => {
           const reviewId = 2;
           return request(app)
-            .get(
-              `/api/reviews/${reviewId}/comments?p=0`
-            )
+            .get(`/api/reviews/${reviewId}/comments?p=0`)
             .expect(400)
             .then(({ body: { message } }) => {
               expect(message).toBe(
                 `Invalid query value of 'p' parameter. Positive number is only permitted`
               );
-            });
-        });
-        test("400 - responds with custom error message when p is out of range", () => {
-          const reviewId = 2;
-          return request(app)
-            .get(
-              `/api/reviews/${reviewId}/comments?p=10`
-            )
-            .expect(400)
-            .then(({ body: { message } }) => {
-              expect(message).toBe(`Page is out of range`);
             });
         });
       });
