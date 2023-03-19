@@ -1,14 +1,20 @@
 ![Units tests and E2E tests workflow](https://github.com/LendiDev/backend-nc-games/actions/workflows/run-tests.yml/badge.svg)
 
-# Northcoders House of Games API
+# NC BoardGames API
 
-This is RESTful API for NC House of Games Front-End that designed to serve reviews, comments, users, categories related to board games. The API is built using Node.js, Express, PostgreSQL, and is designed to be fast, scalable, and easy to use.
+This is RESTful API for NC BoardGames Front-End that designed to serve reviews, comments, users, categories related to board games. The API is built using Node.js, Express, PostgreSQL, and is designed to be fast, scalable, and easy to use.
 
-The users can access reviews on board games from other users and comments on those reviews. They can also post and delete comments for the reviews.
+The users can access reviews on board games from other users and comments on those reviews. They can also post and delete comments for the reviews. Also, up vote and down vote comments & reviews.
 
 ## Live version
 
-Live version of this API can be found at https://nc-games.lendi.dev/api
+Live version of this API can be found here: https://nc-games.lendi.dev/api
+
+## Front-End based on this API
+Live version of the Web Application can be found here : https://nc-bg.netlify.app/
+
+## Front-End Repository 
+The Front-End for this project is hosted in a separate repository. You can find it here: https://github.com/LendiDev/fe-nc-games/
 
 ## Prerequisites
 
