@@ -16,6 +16,24 @@ Live version of the Web Application can be found here : https://nc-bg.netlify.ap
 ## Front-End Repository 
 The Front-End for this project is hosted in a separate repository. You can find it here: https://github.com/LendiDev/fe-nc-games/
 
+## Challenges Faced
+
+While developing the API for the NC BoardGames project, I encountered several challenges that contributed to my growth as a developer and enhanced the overall quality of the API. Some of the key challenges I faced when working with Node.js, Express, PostgreSQL:
+
+1. <b>Testing and continuous integration</b>: Writing comprehensive tests for the API endpoints and ensuring a smooth continuous integration process was one of the challenges. I used tools like Jest and Supertest.
+
+2. <b>Error handling</b>: Handling errors gracefully and providing useful feedback was important. I used custom error handling middleware.
+
+3. <b>Express route handling</b>: Organizing and structuring Express routes in a scalable and maintainable way was another challenge. I employed best practices like modularization, models, controllers, middlewares, and proper error handling to ensure our API was easy to maintain and extend.
+
+4. <b>Complex queries</b>: Crafting complex SQL queries for filtering, sorting, and aggregating data was challenging. I utilized PostgreSQL features like JOINs, subqueries, and aggregate functions (such as json_aggr, COUNT) to create efficient and flexible queries that met the API requirements.
+
+5. <b>API documentation</b>: Providing clear documentation was essential. I used JSON to create a basic API documentation for all available end points (can be found here: https://nc-games.lendi.dev/api).
+
+6. <b>CI/CD with GitHub Actions</b>: I have also integrated Continuous Integration and Continuous Deployment (CI/CD) using GitHub Actions. This enables me to automate the process of building and testing my application, ensuring that the codebase remains stable and functional at all times.
+
+By overcoming these challenges, I was able to create a robust, scalable, and maintainable API that serves as a solid foundation for the NC BoardGames Front-End.
+
 ## Prerequisites
 
 The minimum required versions of Node.js and Postgres:
@@ -89,7 +107,7 @@ To install and run this API locally, follow these steps:
     
 
 
-### Testing
+## Testing
 
 To run the tests for this API, follow this step:
 
