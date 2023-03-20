@@ -30,7 +30,7 @@ While developing the API for the NC BoardGames project, I encountered several ch
 
 5. <b>API documentation</b>: Providing clear documentation was essential. I used JSON to create a basic API documentation for all available end points (can be found here: https://nc-games.lendi.dev/api).
 
-6. <b>CI/CD with GitHub Actions</b>: I have also integrated Continuous Integration and Continuous Deployment (CI/CD) using GitHub Actions. This enables me to automate the process of building and testing my application, ensuring that the codebase remains stable and functional at all times.
+6. <b>CI with GitHub Actions</b>: I have also integrated Continuous Integration (CI) using GitHub Actions. This enables me to automate the process of building and testing my application, ensuring that the codebase remains stable and functional at all times.
 
 By overcoming these challenges, I was able to create a robust, scalable, and maintainable API that serves as a solid foundation for the NC BoardGames Front-End.
 
